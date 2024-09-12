@@ -7,3 +7,4 @@ plotly
 streamlit==1.38.0
 google-ai-generativelanguage
 openai
+streamlit-authenticator

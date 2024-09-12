@@ -1,0 +1,27 @@
+cookie:
+  expiry_days: 30
+  key: abcd
+  name: arora_app
+credentials:
+  usernames:
+    anubhavyadav:
+      email: anubhav@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Anubhav Yadav
+      password: $2b$12$uoonWIdSMPfuNg0StCUVj.VS/ylo2vRK3bsCN7i.W4lh8Cl5E9Bu.
+    eshaansabharwal:
+      email: eshaan@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Eshaan Sabharwal
+      password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
+    drishtijaiswal:
+      email: drishti@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Drishti Jaiswal
+      password: $2b$12$LfRqC5gspjgSzEcAhIg6MeKlL525SdOYiCNhwlErSOOztA1RMIAOy
+pre-authorized:
+  emails:
+    - anubhavyadavff@gmail.com
