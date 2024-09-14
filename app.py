@@ -215,8 +215,8 @@ def ai_recommendations():
 if st.session_state["authentication_status"]:
     pg = st.navigation([
         st.Page(introduction, title='Home', icon='🏠'),
-        st.Page(statistical_analysis, title='Statistical Analysis', icon='📊'),
-        st.Page(data_visualization, title='Data Visualization', icon='📈'),
+        st.Page(statistical_analysis, title='CleanStats', icon='🧹'),
+        st.Page(data_visualization, title='AutoViz', icon='📈'),
         st.Page(predictive_analysis, title='Predictive Analysis', icon='🔮'),
         st.Page(analysis_report, title='Analysis Report', icon='📑'),
         st.Page(ai_recommendations, title='AI Recommendations', icon='🤖')
