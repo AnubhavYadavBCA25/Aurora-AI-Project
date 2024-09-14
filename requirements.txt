@@ -5,6 +5,7 @@ matplotlib
 seaborn
 plotly
 streamlit==1.38.0
-google-ai-generativelanguage
-openai
+google-generativeai
 streamlit-authenticator
+openpyxl
+python-dotenv

@@ -6,6 +6,9 @@ from sklearn.impute import SimpleImputer
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
 # Streamlit page configuration
 st.set_page_config(
@@ -94,77 +97,107 @@ if st.session_state['register']:
 else:
     show_login_form()  # Show login form
 
+#-------------------------------- AI Models-----------------------------------#
+# Gemini API
+load_dotenv()
+genai_api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=genai_api_key)
+model = genai.GenerativeModel('gemini-pro')
+config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=500)
+
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
     st.header('🤖Aurora: AI Powered Data Analysis Tool', divider='rainbow')
     st.subheader("Introduction")
     st.write("Welcome to Aurora AI, an AI powered data analysis tool.")
 
-
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
 def statistical_analysis():
     st.header('🧹CleanStats: Cleaning & Statistical Analysis', divider='rainbow')
 
-    # Upload dataset
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
+    # Function for loading csv format file:
+    def load_csv_format(file):
+        df = pd.read_csv(file)
+        return df
+    
+    # Function for loading xlsx format file:
+    def load_xlsx_format(file):
+        df = pd.read_excel(file)
+        return df
+
+    # Function for loading file based on its format:
+    def load_file(uploaded_file):
+        if uploaded_file.name.endswith('.csv'):
+            return load_csv_format(uploaded_file)
+        elif uploaded_file.name.endswith('.xlsx'):
+            return load_xlsx_format(uploaded_file)
+        else:
+            st.error("Unsupported file format. Please upload a CSV or XLSX file.")
         st.success("File uploaded successfully!")
 
+    # Upload dataset
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+
+    if uploaded_file is not None:
+    # Load the file based on its format
+        df = load_file(uploaded_file)
+
+        if df is not None:
         # Remove duplicate rows
-        df = df.drop_duplicates()
+            df = df.drop_duplicates()
 
-        # Impute missing values
+            # Impute missing values
 
-        # Seperate numerical and object columns
-        numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
-        object_columns = df.select_dtypes(include=['object']).columns
+            # Seperate numerical and object columns
+            numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+            object_columns = df.select_dtypes(include=['object']).columns
 
-        # Impute missing values for numerical columns and object columns
-        numerical_imputer = SimpleImputer(strategy='mean')
-        df[numerical_columns] = numerical_imputer.fit_transform(df[numerical_columns])
+            # Impute missing values for numerical columns and object columns
+            numerical_imputer = SimpleImputer(strategy='mean')
+            df[numerical_columns] = numerical_imputer.fit_transform(df[numerical_columns])
 
-        object_imputer = SimpleImputer(strategy='most_frequent')
-        df[object_columns] = object_imputer.fit_transform(df[object_columns])
+            object_imputer = SimpleImputer(strategy='most_frequent')
+            df[object_columns] = object_imputer.fit_transform(df[object_columns])
 
-        # Display dataset
-        st.subheader("Dataset Preview:", divider='rainbow')
-        st.dataframe(df)
-    
-        # Basic statistics
-        st.subheader("Basic Statistics", divider='rainbow')
-        st.write("For numerical columns:")
-        st.write(df.describe().transpose())
+            # Display dataset
+            st.subheader("Dataset Preview:", divider='rainbow')
+            st.dataframe(df)
+        
+            # Basic statistics
+            st.subheader("Basic Statistics:", divider='rainbow')
+            st.write("For numerical columns:")
+            st.write(df.describe().transpose())
 
-        st.write("For categorical columns:")
-        st.write(df.describe(include='object').transpose())
+            st.write("For categorical columns:")
+            st.write(df.describe(include='object').transpose())
 
-        # Correlation analysis for numerical columns
-        st.subheader("Correlation Analysis", divider='rainbow')
-        numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
-        correlation_matrix = df[numerical_columns].corr()
-        st.write(correlation_matrix)
+            # Correlation analysis for numerical columns
+            st.subheader("Correlation Analysis:", divider='rainbow')
+            numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+            correlation_matrix = df[numerical_columns].corr()
+            st.write(correlation_matrix)
 
-        # Skewness and Kurtosis for numerical columns
-        st.subheader("Skewness and Kurtosis", divider='rainbow')
-        skewness = df.skew(numeric_only=True)
-        kurtosis = df.kurt(numeric_only=True)
-        skew_kurt_df = pd.DataFrame({
-            'Skewness': skewness,
-            'Kurtosis': kurtosis
-        })
-        st.write(skew_kurt_df)
+            # Skewness and Kurtosis for numerical columns
+            st.subheader("Skewness and Kurtosis:", divider='rainbow')
+            skewness = df.skew(numeric_only=True)
+            kurtosis = df.kurt(numeric_only=True)
+            skew_kurt_df = pd.DataFrame({
+                'Skewness': skewness,
+                'Kurtosis': kurtosis
+            })
+            st.write(skew_kurt_df)
 
-        # Unique Values Count
-        st.subheader("Unique Values Count:", divider='rainbow')
-        st.write("Categorical columns unique values:")
-        st.write(df.select_dtypes(include=['object']).nunique())
-        st.write("Numerical columns unique values:")
-        st.write(df.select_dtypes(include=[np.number]).nunique())
+            # Unique Values Count
+            st.subheader("Unique Values Count:", divider='rainbow')
+            col1, col2 = st.columns(2)
+            col1.write("Categorical columns unique values:")
+            col1.write(df.select_dtypes(include=['object']).nunique())
+            col2.write("Numerical columns unique values:")
+            col2.write(df.select_dtypes(include=[np.number]).nunique())
 
 #----------------------------- Page 2: Data Visualization -----------------------------#
 def data_visualization():
-    st.header('Data Visualization', divider='rainbow')
+    st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
 
 #----------------------------- Page 3: Predictive Analysis -----------------------------#
 def predictive_analysis():
