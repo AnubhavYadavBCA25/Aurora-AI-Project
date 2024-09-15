@@ -2,6 +2,8 @@ import yaml
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.impute import SimpleImputer
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
@@ -77,7 +79,6 @@ def show_register_form():
                 'password': hashed_password,
                 'email': new_email
             }
-
             # Save the updated credentials to the config.yaml file
             with open('config.yaml', 'w') as file:
                 yaml.dump(config, file)
@@ -102,8 +103,47 @@ else:
 load_dotenv()
 genai_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=genai_api_key)
-model = genai.GenerativeModel('gemini-pro')
-config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=500)
+model = genai.GenerativeModel('gemini-1.5-flash')
+config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=300)
+
+#----------------------------- Data Loading & Cleaning Functions -----------------------------#
+# Function for loading csv format file:
+def load_csv_format(file):
+        df = pd.read_csv(file)
+        return df
+    
+# Function for loading xlsx format file:
+def load_xlsx_format(file):
+        df = pd.read_excel(file)
+        return df
+
+# Function for loading file based on its format:
+def load_file(uploaded_file):
+    if uploaded_file.name.endswith('.csv'):
+            return load_csv_format(uploaded_file)
+    elif uploaded_file.name.endswith('.xlsx'):
+            return load_xlsx_format(uploaded_file)
+    else:
+        st.error("Unsupported file format. Please upload a CSV or XLSX file.")
+    st.success("File uploaded successfully!")
+
+def df_cleaning(df):
+    df = df.drop_duplicates()
+
+    # Impute missing values
+
+    # Seperate numerical and object columns
+    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+    object_columns = df.select_dtypes(include=['object']).columns
+
+    # Impute missing values for numerical columns and object columns
+    numerical_imputer = SimpleImputer(strategy='mean')
+    df[numerical_columns] = numerical_imputer.fit_transform(df[numerical_columns])
+
+    object_imputer = SimpleImputer(strategy='most_frequent')
+    df[object_columns] = object_imputer.fit_transform(df[object_columns])
+        
+    return df
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
@@ -114,27 +154,7 @@ def introduction():
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
 def statistical_analysis():
     st.header('🧹CleanStats: Cleaning & Statistical Analysis', divider='rainbow')
-
-    # Function for loading csv format file:
-    def load_csv_format(file):
-        df = pd.read_csv(file)
-        return df
     
-    # Function for loading xlsx format file:
-    def load_xlsx_format(file):
-        df = pd.read_excel(file)
-        return df
-
-    # Function for loading file based on its format:
-    def load_file(uploaded_file):
-        if uploaded_file.name.endswith('.csv'):
-            return load_csv_format(uploaded_file)
-        elif uploaded_file.name.endswith('.xlsx'):
-            return load_xlsx_format(uploaded_file)
-        else:
-            st.error("Unsupported file format. Please upload a CSV or XLSX file.")
-        st.success("File uploaded successfully!")
-
     # Upload dataset
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
 
@@ -144,20 +164,7 @@ def statistical_analysis():
 
         if df is not None:
         # Remove duplicate rows
-            df = df.drop_duplicates()
-
-            # Impute missing values
-
-            # Seperate numerical and object columns
-            numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
-            object_columns = df.select_dtypes(include=['object']).columns
-
-            # Impute missing values for numerical columns and object columns
-            numerical_imputer = SimpleImputer(strategy='mean')
-            df[numerical_columns] = numerical_imputer.fit_transform(df[numerical_columns])
-
-            object_imputer = SimpleImputer(strategy='most_frequent')
-            df[object_columns] = object_imputer.fit_transform(df[object_columns])
+            df_cleaning(df)
 
             # Display dataset
             st.subheader("Dataset Preview:", divider='rainbow')
@@ -198,6 +205,59 @@ def statistical_analysis():
 #----------------------------- Page 2: Data Visualization -----------------------------#
 def data_visualization():
     st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
+    st.write('Upload a dataset to visualize:')
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    
+    if uploaded_file is not None:
+        # Load the file based on its format
+        df = load_file(uploaded_file)
+        st.success("File uploaded successfully!")
+        file_name = uploaded_file.name
+        # For demonstration, saving the uploaded file temporarily (optional)
+        file_path = os.path.join(os.getcwd(), file_name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        if df is not None:
+            # Apply data cleaning function
+            df_cleaning(df)
+
+            # Display dataset
+            st.subheader("Dataset Preview:", divider='rainbow')
+            st.dataframe(df)
+            df_sample = str(df.head(5))
+            st.divider()
+
+            # Select the type of visualization
+            st.write('Select the type of visualization:')
+            visualization_type = st.selectbox("Visualization Type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Heatmap", "Pie Chart", "Violin Plot", "Count Plot",  "KDE Plot"])
+            st.divider()
+
+            # User Prompt for selecting columns
+            st.write('Enter Columns You Want To Plot:')
+            prompt = st.text_input("Prompt")
+
+            # Call the AI model to generate the visualization code and display the visualization
+            if st.button("Visualize"):
+                if uploaded_file is None:
+                    st.error("Please upload a file first.")
+                else:
+                    predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
+                    Plot for the dataset columns {prompt}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
+                    Set title in each plot. Don't right the explanation, just write the code."""
+                    response = model.generate_content(predefined_prompt, generation_config=config)
+                    generated_code = response.text
+                    generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                    # Step 5: Modify the code to insert the actual file path into pd.read_csv()
+                    if "pd.read_csv" in generated_code:
+                        generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                    elif "pd.read_excel" in generated_code:
+                        generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                    st.code(generated_code, language='python')
+                    try:
+                        exec(generated_code)
+                        st.pyplot(plt.gcf())
+                    except Exception as e:
+                        st.error(e)
 
 #----------------------------- Page 3: Predictive Analysis -----------------------------#
 def predictive_analysis():

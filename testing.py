@@ -13,9 +13,11 @@ def models():
         if 'generateContent' in m.supported_generation_methods:
             print(m.name)
 
-st.title('Generative AI Testing')
-model = genai.GenerativeModel('gemini-pro')
-config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=500)
-prompt = 'Write a code in python to plot a barplot'
-response = model.generate_content(prompt, generation_config=config)
-st.write(response.text)
+# st.title('Generative AI Testing')
+# model = genai.GenerativeModel('gemini-pro')
+# config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=500)
+# prompt = 'Write a code in python to plot a barplot'
+# response = model.generate_content(prompt, generation_config=config)
+# st.write(response.text)
+upload = st.file_uploader("Choose a file")
+st.write(upload)
