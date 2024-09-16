@@ -1,7 +1,7 @@
 cookie:
   expiry_days: 30
   key: abcd
-  name: arora_app
+  name: aurora_app
 credentials:
   usernames:
     anubhavyadav:
@@ -24,6 +24,8 @@ credentials:
       password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
     sparshjaiswal:
       email: sparsh@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
       name: Sparsh Jaiswal
       password: $2b$12$kOE2qlBMrHN7DJbWmiTGR.ZwV3ee3ntC4tfaieOJedPb8csDb.Qfm
 pre-authorized:
