@@ -1,3 +1,4 @@
+import os
 import yaml
 import streamlit as st
 import pandas as pd
@@ -5,11 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.impute import SimpleImputer
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
 import google.generativeai as genai
-import os
 from dotenv import load_dotenv
 
 # Streamlit page configuration
@@ -20,7 +22,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-#-----------------------------User Authentication-----------------------------#
+#----------------------------- User Authentication -----------------------------#
 
 # Loading config file
 with open('config.yaml', 'r', encoding='utf-8') as file:
@@ -98,7 +100,7 @@ if st.session_state['register']:
 else:
     show_login_form()  # Show login form
 
-#-------------------------------- AI Models-----------------------------------#
+#-------------------------------- AI Models -----------------------------------#
 # Gemini API
 load_dotenv()
 genai_api_key = os.getenv("GEMINI_API_KEY")
@@ -106,18 +108,18 @@ genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=300)
 
-#----------------------------- Data Loading & Cleaning Functions -----------------------------#
-# Function for loading csv format file:
+#----------------------------- All Important Functions -----------------------------#
+# Function for loading csv format file
 def load_csv_format(file):
         df = pd.read_csv(file)
         return df
     
-# Function for loading xlsx format file:
+# Function for loading xlsx format file
 def load_xlsx_format(file):
         df = pd.read_excel(file)
         return df
 
-# Function for loading file based on its format:
+# Function for loading file based on its format
 def load_file(uploaded_file):
     if uploaded_file.name.endswith('.csv'):
             return load_csv_format(uploaded_file)
@@ -125,13 +127,12 @@ def load_file(uploaded_file):
             return load_xlsx_format(uploaded_file)
     else:
         st.error("Unsupported file format. Please upload a CSV or XLSX file.")
-    st.success("File uploaded successfully!")
 
+# Function for data cleaning
 def df_cleaning(df):
     df = df.drop_duplicates()
 
     # Impute missing values
-
     # Seperate numerical and object columns
     numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
     object_columns = df.select_dtypes(include=['object']).columns
@@ -142,8 +143,23 @@ def df_cleaning(df):
 
     object_imputer = SimpleImputer(strategy='most_frequent')
     df[object_columns] = object_imputer.fit_transform(df[object_columns])
-        
     return df
+
+# Function for regression evaluation
+def evaluate_reg_model(true, predicted):
+    mae = mean_absolute_error(true, predicted)
+    mse = mean_squared_error(true, predicted)
+    rmse = np.sqrt(mean_squared_error(true, predicted))
+    r2_square = r2_score(true, predicted)
+    return mae, mse, rmse, r2_square
+
+# Function for classification evaluation
+def evaluate_clf_model(true, predicted):
+    accuracy = accuracy_score(true, predicted)
+    precision = precision_score(true, predicted)
+    recall = recall_score(true, predicted)
+    f1 = f1_score(true, predicted)
+    return accuracy, precision, recall, f1
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
@@ -247,7 +263,8 @@ def data_visualization():
                     response = model.generate_content(predefined_prompt, generation_config=config)
                     generated_code = response.text
                     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                    # Step 5: Modify the code to insert the actual file path into pd.read_csv()
+                    
+                    # Modify the code to insert the actual file path into pd.read_csv()
                     if "pd.read_csv" in generated_code:
                         generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
                     elif "pd.read_excel" in generated_code:
@@ -261,7 +278,30 @@ def data_visualization():
 
 #----------------------------- Page 3: Predictive Analysis -----------------------------#
 def predictive_analysis():
-    st.header('Predictive Analysis', divider='rainbow')
+    st.header('🔮PredictEase: Predictive Analysis', divider='rainbow')
+    st.write('Upload a dataset to predict:')
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    if uploaded_file is not None:
+        # Load the file based on its format
+        df = load_file(uploaded_file)
+        st.success("File uploaded successfully!")
+        file_name = uploaded_file.name
+        # For demonstration, saving the uploaded file temporarily (optional)
+        file_path = os.path.join(os.getcwd(), file_name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        if df is not None:
+            # Apply data cleaning function
+            df_cleaning(df)
+            df_sample = df.head(5)
+            st.dataframe(df_sample)
+
+            col1, col2 = st.columns(2)
+            # Select the traget column
+            target_column = col1.selectbox("Select the target column", ["Select"] + df.columns.tolist())
+            # Select the problem type
+            problem_type = col2.selectbox("Select the problem type", ["Select", "Classification", "Regression"])
+            
 
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():
@@ -277,7 +317,7 @@ if st.session_state["authentication_status"]:
         st.Page(introduction, title='Home', icon='🏠'),
         st.Page(statistical_analysis, title='CleanStats', icon='🧹'),
         st.Page(data_visualization, title='AutoViz', icon='📈'),
-        st.Page(predictive_analysis, title='Predictive Analysis', icon='🔮'),
+        st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
         st.Page(analysis_report, title='Analysis Report', icon='📑'),
         st.Page(ai_recommendations, title='AI Recommendations', icon='🤖')
     ])
