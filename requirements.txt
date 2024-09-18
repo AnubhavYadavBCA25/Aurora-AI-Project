@@ -9,3 +9,4 @@ google-generativeai
 streamlit-authenticator
 openpyxl
 python-dotenv
+streamlit-lottie

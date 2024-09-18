@@ -1,18 +1,21 @@
 import os
 import yaml
-import streamlit as st
+import requests
+import json
 import pandas as pd
 import numpy as np
+import streamlit as st
+import streamlit_lottie as st_lottie
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
 import google.generativeai as genai
 from dotenv import load_dotenv
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 # Streamlit page configuration
 st.set_page_config(
@@ -108,7 +111,7 @@ genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=300)
 
-#----------------------------- All Important Functions -----------------------------#
+#----------------------------- Functions -----------------------------#
 # Function for loading csv format file
 def load_csv_format(file):
         df = pd.read_csv(file)
@@ -145,6 +148,11 @@ def df_cleaning(df):
     df[object_columns] = object_imputer.fit_transform(df[object_columns])
     return df
 
+# Function for lottie file
+def load_lottie_file(filepath: str):
+    with open(filepath, "r", encoding="utf-8") as file:
+        return json.load(file)
+
 # Function for regression evaluation
 def evaluate_reg_model(true, predicted):
     mae = mean_absolute_error(true, predicted)
@@ -163,9 +171,14 @@ def evaluate_clf_model(true, predicted):
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
-    st.header('🤖Aurora: AI Powered Data Analysis Tool', divider='rainbow')
-    st.subheader("Introduction")
-    st.write("Welcome to Aurora AI, an AI powered data analysis tool.")
+    st.header('🤖Aurora: Data Analytics Tool', divider='rainbow')
+    robot_file = load_lottie_file('animations/robot.json')
+    left_column, right_column = st.columns(2)
+    with left_column:
+        st.subheader("Introduction")
+        st.write("Welcome to Aurora AI, an AI powered data analysis tool.")
+    with right_column:
+        st_lottie.st_lottie(robot_file, key='robot', height=500, width=500 ,loop=True)
 
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
 def statistical_analysis():
