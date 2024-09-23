@@ -1,6 +1,5 @@
 import os
 import yaml
-import requests
 import json
 import pandas as pd
 import numpy as np
@@ -345,6 +344,43 @@ def analysis_report():
 def ai_recommendations():
     st.header('AI Recommendations', divider='rainbow')
 
+#----------------------------- About Us -----------------------------#
+def about_us():
+    st.header('👨‍💻About Us', divider='rainbow')
+    left_column, right_column = st.columns(2)
+    with left_column:
+        st.subheader("Anubhav Yadav")
+    with right_column:
+        pass # Profile picture
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with right_column:
+        st.subheader("Sparsh Jaiswal")
+    with left_column:
+        pass # Profile picture
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with left_column:
+        st.subheader("Eshaan Sabharwal")
+    with right_column:
+        pass # Profile picture
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with right_column:
+        st.subheader("Drishti Jaiswal")
+    with left_column:
+        pass # Profile picture
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with left_column:
+        st.subheader("Satyam Kumar")
+    with right_column:
+        pass # Profile picture
+    st.divider()
 #----------------------------- Navigation -----------------------------#
 if st.session_state["authentication_status"]:
     pg = st.navigation([
@@ -353,6 +389,7 @@ if st.session_state["authentication_status"]:
         st.Page(data_visualization, title='AutoViz', icon='📈'),
         st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
         st.Page(analysis_report, title='Analysis Report', icon='📑'),
-        st.Page(ai_recommendations, title='AI Recommendations', icon='🤖')
+        st.Page(ai_recommendations, title='AI Recommendations', icon='🤖'),
+        st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
     pg.run()
