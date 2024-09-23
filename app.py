@@ -171,7 +171,7 @@ def evaluate_clf_model(true, predicted):
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
-    st.header('🤖Aurora: Data Analytics Tool', divider='rainbow')
+    st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
     robot_file = load_lottie_file('animations/robot.json')
     left_column, right_column = st.columns(2)
     with left_column:
@@ -179,6 +179,27 @@ def introduction():
         st.write("Welcome to Aurora AI, an AI powered data analysis tool.")
     with right_column:
         st_lottie.st_lottie(robot_file, key='robot', height=500, width=500 ,loop=True)
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with right_column:
+        st.subheader("Features:")
+        st.write("1. CleanStats: Data Cleaning & Statistical Analysis")
+        st.write("2. AutoViz: Data Visualization & EDA")
+        st.write("3. PredictEase: Predictive Analysis")
+        st.write("4. Analysis Report")
+        st.write("5. AI Recommendations")
+    with left_column:
+        pass
+    st.divider()
+
+    left_column, right_column = st.columns(2)
+    with left_column:
+        st.subheader('Technology Stack:')
+    with right_column:
+        tech_used = load_lottie_file('animations/tech_used.json')
+        st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
+    st.divider()
 
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
 def statistical_analysis():

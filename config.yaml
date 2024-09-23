@@ -4,6 +4,10 @@ cookie:
   name: aurora_app
 credentials:
   usernames:
+    ak9888:
+      email: ak9888@srmist.edu.in
+      name: arnav kumar
+      password: $2b$12$t/CusPJ8HRDzK8al/mTr5OMK.meh.wqqIGZCwP2b0ENJaniDcukBW
     anubhavyadav:
       email: anubhav@gmail.com
       failed_login_attempts: 0
