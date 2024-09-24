@@ -15,6 +15,13 @@ from dotenv import load_dotenv
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.svm import SVR, SVC
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from xgboost import XGBRegressor, XGBClassifier
 
 # Streamlit page configuration
 st.set_page_config(
@@ -160,6 +167,34 @@ def evaluate_reg_model(true, predicted):
     r2_square = r2_score(true, predicted)
     return mae, mse, rmse, r2_square
 
+# Function for predicting regression model
+def predict_reg_model(df, target_column, algorithm):
+    X = df.drop(target_column, axis=1)
+    y = df[target_column]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Scaling the X_train and X_test
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    if algorithm == "Linear Regression":
+        model = LinearRegression()
+    elif algorithm == "Random Forest":
+        model = RandomForestRegressor(n_estimators=100)
+    elif algorithm == "Decision Tree":
+        model = DecisionTreeRegressor()
+    elif algorithm == "XGBoost":
+        model = XGBRegressor()
+    elif algorithm == "SVR":
+        model = SVR(kernel='rbf')
+
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+
+    mae, mse, rmse, r2_square = evaluate_reg_model(y_test, y_pred)
+    return y_pred, mae, mse, rmse, r2_square
+
 # Function for classification evaluation
 def evaluate_clf_model(true, predicted):
     accuracy = accuracy_score(true, predicted)
@@ -175,26 +210,43 @@ def introduction():
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Introduction")
-        st.write("Welcome to Aurora AI, an AI powered data analysis tool.")
+        st.markdown('''Aurora AI: An Advanced Automation using AI for Complex Data Analysis is a web-based application developed 
+                    to automate the intricate process of data analysis using cutting-edge AI and machine learning technologies. With a 
+                    user-friendly interface, Aurora allows users to upload datasets and perform tasks like data cleaning, visualization, and 
+                    predictive modeling, all with minimal manual intervention. The platform is designed to save time and effort, delivering 
+                    actionable insights through automated processes that typically require advanced data science skills. Whether you're handling
+                     small datasets or large, complex ones, Aurora simplifies the workflow, making data-driven decision-making faster and more 
+                    efficient.''')
     with right_column:
-        st_lottie.st_lottie(robot_file, key='robot', height=500, width=500 ,loop=True)
+        st_lottie.st_lottie(robot_file, key='robot', height=400, width=400 ,loop=True)
     st.divider()
 
     left_column, right_column = st.columns(2)
     with right_column:
         st.subheader("Features:")
-        st.write("1. CleanStats: Data Cleaning & Statistical Analysis")
-        st.write("2. AutoViz: Data Visualization & EDA")
-        st.write("3. PredictEase: Predictive Analysis")
-        st.write("4. Analysis Report")
-        st.write("5. AI Recommendations")
+        st.markdown('''
+                    - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
+                    - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
+                    - **PredictEase:** A feature for predictive analysis. Where you can predict the target variable using different algorithms.
+                    - **Analysis Report**
+                    - **AI Recommendations**''')
     with left_column:
-        pass
+        features = load_lottie_file('animations/features.json')
+        st_lottie.st_lottie(features, key='features', height=300, width=300 ,loop=True)
     st.divider()
 
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader('Technology Stack:')
+        st.markdown('''
+            - **Python:** Core programming language used for data processing, machine learning, and backend logic.
+            - **Streamlit:** Framework used to build the interactive web application and user interface.
+            - **Pandas:** Library for efficient data manipulation, cleaning, and analysis.
+            - **Scikit-learn:** Machine learning library used for model building, classification, and regression tasks.
+            - **Matplotlib/Seaborn:** Libraries for generating data visualizations and plots.
+            - **Gemini API:** Used for automating code generation for visualizations and data handling.
+            - **Streamlit-Authenticator:** For handling user authentication, login, and registration.
+            - **.env:** For securely storing environment variables like API keys and sensitive data.''')
     with right_column:
         tech_used = load_lottie_file('animations/tech_used.json')
         st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
@@ -210,14 +262,15 @@ def statistical_analysis():
     if uploaded_file is not None:
     # Load the file based on its format
         df = load_file(uploaded_file)
-
+        st.success("File uploaded successfully!")
         if df is not None:
         # Remove duplicate rows
             df_cleaning(df)
 
             # Display dataset
             st.subheader("Dataset Preview:", divider='rainbow')
-            st.dataframe(df)
+            df_sample = df.head(5)
+            st.dataframe(df_sample)
         
             # Basic statistics
             st.subheader("Basic Statistics:", divider='rainbow')
@@ -272,8 +325,9 @@ def data_visualization():
 
             # Display dataset
             st.subheader("Dataset Preview:", divider='rainbow')
-            st.dataframe(df)
             df_sample = str(df.head(5))
+            df_for_vis = df.head(5)
+            st.dataframe(df_for_vis)
             st.divider()
 
             # Select the type of visualization
@@ -292,7 +346,7 @@ def data_visualization():
                 else:
                     predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
                     Plot for the dataset columns {prompt}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
-                    Set title in each plot. Don't right the explanation, just write the code."""
+                    Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
                     response = model.generate_content(predefined_prompt, generation_config=config)
                     generated_code = response.text
                     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
@@ -329,12 +383,20 @@ def predictive_analysis():
             df_sample = df.head(5)
             st.dataframe(df_sample)
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             # Select the traget column
             target_column = col1.selectbox("Select the target column", ["Select"] + df.columns.tolist())
             # Select the problem type
             problem_type = col2.selectbox("Select the problem type", ["Select", "Classification", "Regression"])
+            # Select the algorithm
+            if problem_type == "Classification":
+                algorithm_class = col3.selectbox("Select the algorithm", ["Select", "Logistic Regression", "Random Forest", "Decision Tree", "XGBoost", "SVC"])
+            elif problem_type == "Regression":
+                algorithm_reg = col3.selectbox("Select the algorithm", ["Select", "Linear Regression", "Random Forest", "Decision Tree", "XGBoost", "SVR"])
+            else:
+                st.warning("Please select the problem type first.")
             
+
 
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():

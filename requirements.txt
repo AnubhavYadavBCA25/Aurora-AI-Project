@@ -10,3 +10,4 @@ streamlit-authenticator
 openpyxl
 python-dotenv
 streamlit-lottie
+xgboost
