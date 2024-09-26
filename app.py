@@ -10,6 +10,7 @@ import seaborn as sns
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
+from ydata_profiling import ProfileReport
 import google.generativeai as genai
 from dotenv import load_dotenv
 from sklearn.impute import SimpleImputer
@@ -191,6 +192,20 @@ def evaluate_clf_model(true, predicted):
     recall = recall_score(true, predicted)
     f1 = f1_score(true, predicted)
     return accuracy, precision, recall, f1
+
+# Function for report generation
+def generate_report(file):
+    # Read CSV or Excel file
+    if file.name.endswith('.csv'):
+        df = pd.read_csv(file)
+    elif file.name.endswith('.xlsx'):
+        df = pd.read_excel(file)
+    # Generate profiling report
+    profile = ProfileReport(df, title="Dataset Report", explorative=True)
+    # Save the report as an HTML file
+    output_path = os.path.join("reports", f"{file.name.split('.')[0]}_report.html")
+    profile.to_file(output_path)
+    return output_path
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
@@ -407,19 +422,19 @@ def predictive_analysis():
                         Use accuracy, precision, recall, f1 score for evaluation in table form. Make a confusion matrix. After that, finally train the model on whole dataset 
                         and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
                         response = model.generate_content(prompt_for_class, generation_config=config)
-                        print(response.text)
-                        generated_code = response.text
-                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                        # Modify the code to insert the actual file path into pd.read_csv()
-                        if "pd.read_csv" in generated_code:
-                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                        elif "pd.read_excel" in generated_code:
-                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                        st.code(generated_code, language='python')
-                        try:
-                            exec(generated_code)
-                        except Exception as e:
-                            st.error(e)
+                        print(response)
+                        # generated_code = response.text
+                        # generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                        # # Modify the code to insert the actual file path into pd.read_csv()
+                        # if "pd.read_csv" in generated_code:
+                        #     generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                        # elif "pd.read_excel" in generated_code:
+                        #     generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                        # st.code(generated_code, language='python')
+                        # try:
+                        #     exec(generated_code)
+                        # except Exception as e:
+                        #     st.error(e)
 
                     elif problem_type == "Regression":
                         if algorithm_reg == "Linear Regression":
@@ -439,71 +454,36 @@ def predictive_analysis():
                         Use mean absolute error, mean squared error, root mean squared error, r2 score for evaluation in table form. After that, finally train the model on whole dataset
                         and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
                         response = model.generate_content(prompt_for_reg, generation_config=config)
-                        generated_code = response.text
-                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                        # Modify the code to insert the actual file path into pd.read_csv()
-                        if "pd.read_csv" in generated_code:
-                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                        elif "pd.read_excel" in generated_code:
-                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                        st.code(generated_code, language='python')
-                        try:
-                            exec(generated_code)
-                        except Exception as e:
-                            st.error(e)
+                        print(response)
+                        # generated_code = response.text
+                        # generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                        # # Modify the code to insert the actual file path into pd.read_csv()
+                        # if "pd.read_csv" in generated_code:
+                        #     generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                        # elif "pd.read_excel" in generated_code:
+                        #     generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                        # st.code(generated_code, language='python')
+                        # try:
+                        #     exec(generated_code)
+                        # except Exception as e:
+                        #     st.error(e)
                     else:
                         st.warning("Please select the problem type and algorithm first.")
-                    # Call the AI model to generate the prediction code and display the results
-                    # Classification
-                    
-                    # prompt_for_class = f"""Write a python code to predict the target column {target_column} using {algorithm_class} algorithm for problem type classification. 
-                    # Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values. 
-                    # But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
-                    #  into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
-                    # Use accuracy, precision, recall, f1 score for evaluation in table form. Make a confusion matrix. After that, finally train the model on whole dataset 
-                    # and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
-
-                    # # Regression
-                    # prompt_for_reg = f"""Write a python code to predict the target column {target_column} using {algorithm_reg} algorithm for problem type regression.
-                    # Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values.
-                    # But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
-                    # into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
-                    # Use mean absolute error, mean squared error, root mean squared error, r2 score for evaluation in table form. After that, finally train the model on whole dataset
-                    # and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
-
-                    # if problem_type == "Classification":
-                    #     response = model.generate_content(prompt_for_class, generation_config=config)
-                    #     print(response.text)
-                    #     generated_code = response.text
-                    #     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                    #     # Modify the code to insert the actual file path into pd.read_csv()
-                    #     if "pd.read_csv" in generated_code:
-                    #         generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                    #     elif "pd.read_excel" in generated_code:
-                    #         generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                    #     st.code(generated_code, language='python')
-                    #     try:
-                    #         exec(generated_code)
-                    #     except Exception as e:
-                    #         st.error(e)
-                    # elif problem_type == "Regression":
-                    #     response = model.generate_content(prompt_for_reg, generation_config=config)
-                    #     generated_code = response.text
-                    #     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                    #     # Modify the code to insert the actual file path into pd.read_csv()
-                    #     if "pd.read_csv" in generated_code:
-                    #         generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                    #     elif "pd.read_excel" in generated_code:
-                    #         generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                    #     st.code(generated_code, language='python')
-                    #     try:
-                    #         exec(generated_code)
-                    #     except Exception as e:
-                    #         st.error(e)
 
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():
-    st.header('Analysis Report', divider='rainbow')
+    st.header('📑InsightGen: Automated Data Report Generator', divider='rainbow')
+    st.write('Upload a dataset to generate a report:')
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    if uploaded_file is not None:
+        report_path = generate_report(uploaded_file)
+        with open(report_path, 'rb') as f:
+            st.download_button(
+                label="Download Report",
+                data=f,
+                file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
+                mime="text/html"
+            )
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
 def ai_recommendations():
@@ -553,7 +533,7 @@ if st.session_state["authentication_status"]:
         st.Page(statistical_analysis, title='CleanStats', icon='🧹'),
         st.Page(data_visualization, title='AutoViz', icon='📈'),
         st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
-        st.Page(analysis_report, title='Analysis Report', icon='📑'),
+        st.Page(analysis_report, title='InsightGen', icon='📑'),
         st.Page(ai_recommendations, title='AI Recommendations', icon='🤖'),
         st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
