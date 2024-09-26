@@ -16,7 +16,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder, MinMaxScaler
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.svm import SVR, SVC
@@ -167,33 +167,22 @@ def evaluate_reg_model(true, predicted):
     r2_square = r2_score(true, predicted)
     return mae, mse, rmse, r2_square
 
-# Function for predicting regression model
-def predict_reg_model(df, target_column, algorithm):
-    X = df.drop(target_column, axis=1)
-    y = df[target_column]
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    # Scaling the X_train and X_test
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-
-    if algorithm == "Linear Regression":
-        model = LinearRegression()
-    elif algorithm == "Random Forest":
-        model = RandomForestRegressor(n_estimators=100)
-    elif algorithm == "Decision Tree":
-        model = DecisionTreeRegressor()
-    elif algorithm == "XGBoost":
-        model = XGBRegressor()
-    elif algorithm == "SVR":
-        model = SVR(kernel='rbf')
-
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-
-    mae, mse, rmse, r2_square = evaluate_reg_model(y_test, y_pred)
-    return y_pred, mae, mse, rmse, r2_square
+# Function for gemini prediction
+def gemini_predict(predefined_prompt, file_path):
+    response = model.generate_content(predefined_prompt, generation_config=config)
+    generated_code = response.text
+    generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+    # Modify the code to insert the actual file path into pd.read_csv()
+    if "pd.read_csv" in generated_code:
+        generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+    elif "pd.read_excel" in generated_code:
+        generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+    st.code(generated_code, language='python')
+    try:
+        execution_code = exec(generated_code)
+    except Exception as e:
+        st.error(e)
+    return execution_code
 
 # Function for classification evaluation
 def evaluate_clf_model(true, predicted):
@@ -210,7 +199,7 @@ def introduction():
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Introduction")
-        st.markdown('''Aurora AI: An Advanced Automation using AI for Complex Data Analysis is a web-based application developed 
+        st.markdown('''**Aurora AI:** An Advanced Automation using AI for Complex Data Analysis is a web-based application developed 
                     to automate the intricate process of data analysis using cutting-edge AI and machine learning technologies. With a 
                     user-friendly interface, Aurora allows users to upload datasets and perform tasks like data cleaning, visualization, and 
                     predictive modeling, all with minimal manual intervention. The platform is designed to save time and effort, delivering 
@@ -396,7 +385,121 @@ def predictive_analysis():
             else:
                 st.warning("Please select the problem type first.")
             
+            if st.button("Predict"):
+                if uploaded_file is None:
+                    st.error("Please upload a file first.")
+                else:
+                    if problem_type == "Classification":
+                        if algorithm_class == "Logistic Regression":
+                            st.write("Logistic Regression")
+                        elif algorithm_class == "Random Forest":
+                            st.write("Random Forest")
+                        elif algorithm_class == "Decision Tree":
+                            st.write("Decision Tree")
+                        elif algorithm_class == "XGBoost":
+                            st.write("XGBoost")
+                        elif algorithm_class == "SVC":
+                            st.write("SVC")
+                        prompt_for_class = f"""Write a python code to predict the target column {target_column} using {algorithm_class} algorithm for problem type classification. 
+                        Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values. 
+                        But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
+                        into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
+                        Use accuracy, precision, recall, f1 score for evaluation in table form. Make a confusion matrix. After that, finally train the model on whole dataset 
+                        and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
+                        response = model.generate_content(prompt_for_class, generation_config=config)
+                        print(response.text)
+                        generated_code = response.text
+                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                        # Modify the code to insert the actual file path into pd.read_csv()
+                        if "pd.read_csv" in generated_code:
+                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                        elif "pd.read_excel" in generated_code:
+                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                        st.code(generated_code, language='python')
+                        try:
+                            exec(generated_code)
+                        except Exception as e:
+                            st.error(e)
 
+                    elif problem_type == "Regression":
+                        if algorithm_reg == "Linear Regression":
+                            st.write("Linear Regression")
+                        elif algorithm_reg == "Random Forest":
+                            st.write("Random Forest")
+                        elif algorithm_reg == "Decision Tree":
+                            st.write("Decision Tree")
+                        elif algorithm_reg == "XGBoost":
+                            st.write("XGBoost")
+                        elif algorithm_reg == "SVR":
+                            st.write("SVR")
+                        prompt_for_reg = f"""Write a python code to predict the target column {target_column} using {algorithm_reg} algorithm for problem type regression.
+                        Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values.
+                        But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
+                        into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
+                        Use mean absolute error, mean squared error, root mean squared error, r2 score for evaluation in table form. After that, finally train the model on whole dataset
+                        and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
+                        response = model.generate_content(prompt_for_reg, generation_config=config)
+                        generated_code = response.text
+                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                        # Modify the code to insert the actual file path into pd.read_csv()
+                        if "pd.read_csv" in generated_code:
+                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                        elif "pd.read_excel" in generated_code:
+                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                        st.code(generated_code, language='python')
+                        try:
+                            exec(generated_code)
+                        except Exception as e:
+                            st.error(e)
+                    else:
+                        st.warning("Please select the problem type and algorithm first.")
+                    # Call the AI model to generate the prediction code and display the results
+                    # Classification
+                    
+                    # prompt_for_class = f"""Write a python code to predict the target column {target_column} using {algorithm_class} algorithm for problem type classification. 
+                    # Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values. 
+                    # But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
+                    #  into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
+                    # Use accuracy, precision, recall, f1 score for evaluation in table form. Make a confusion matrix. After that, finally train the model on whole dataset 
+                    # and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
+
+                    # # Regression
+                    # prompt_for_reg = f"""Write a python code to predict the target column {target_column} using {algorithm_reg} algorithm for problem type regression.
+                    # Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values.
+                    # But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
+                    # into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
+                    # Use mean absolute error, mean squared error, root mean squared error, r2 score for evaluation in table form. After that, finally train the model on whole dataset
+                    # and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
+
+                    # if problem_type == "Classification":
+                    #     response = model.generate_content(prompt_for_class, generation_config=config)
+                    #     print(response.text)
+                    #     generated_code = response.text
+                    #     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                    #     # Modify the code to insert the actual file path into pd.read_csv()
+                    #     if "pd.read_csv" in generated_code:
+                    #         generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                    #     elif "pd.read_excel" in generated_code:
+                    #         generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                    #     st.code(generated_code, language='python')
+                    #     try:
+                    #         exec(generated_code)
+                    #     except Exception as e:
+                    #         st.error(e)
+                    # elif problem_type == "Regression":
+                    #     response = model.generate_content(prompt_for_reg, generation_config=config)
+                    #     generated_code = response.text
+                    #     generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                    #     # Modify the code to insert the actual file path into pd.read_csv()
+                    #     if "pd.read_csv" in generated_code:
+                    #         generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                    #     elif "pd.read_excel" in generated_code:
+                    #         generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                    #     st.code(generated_code, language='python')
+                    #     try:
+                    #         exec(generated_code)
+                    #     except Exception as e:
+                    #         st.error(e)
 
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():
