@@ -116,7 +116,7 @@ load_dotenv()
 genai_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
-config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=300)
+config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=1500)
 
 #----------------------------- Functions -----------------------------#
 # Function for loading csv format file
@@ -160,14 +160,6 @@ def load_lottie_file(filepath: str):
     with open(filepath, "r", encoding="utf-8") as file:
         return json.load(file)
 
-# Function for regression evaluation
-def evaluate_reg_model(true, predicted):
-    mae = mean_absolute_error(true, predicted)
-    mse = mean_squared_error(true, predicted)
-    rmse = np.sqrt(mean_squared_error(true, predicted))
-    r2_square = r2_score(true, predicted)
-    return mae, mse, rmse, r2_square
-
 # Function for gemini prediction
 def gemini_predict(predefined_prompt, file_path):
     response = model.generate_content(predefined_prompt, generation_config=config)
@@ -184,14 +176,6 @@ def gemini_predict(predefined_prompt, file_path):
     except Exception as e:
         st.error(e)
     return execution_code
-
-# Function for classification evaluation
-def evaluate_clf_model(true, predicted):
-    accuracy = accuracy_score(true, predicted)
-    precision = precision_score(true, predicted)
-    recall = recall_score(true, predicted)
-    f1 = f1_score(true, predicted)
-    return accuracy, precision, recall, f1
 
 # Function for report generation
 def generate_report(file):
@@ -476,14 +460,24 @@ def analysis_report():
     st.write('Upload a dataset to generate a report:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
     if uploaded_file is not None:
-        report_path = generate_report(uploaded_file)
-        with open(report_path, 'rb') as f:
-            st.download_button(
-                label="Download Report",
-                data=f,
-                file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
-                mime="text/html"
-            )
+        filename = uploaded_file.name
+        df = load_file(uploaded_file)
+        st.success("File uploaded successfully!")
+        if df is not None:
+            # Gemini Text Report Generation
+            st.subheader('Text Report Using AI')
+            summary = df.describe().transpose().to_string()
+            prompt = f"""Generate a text report for {filename} dataset using Gemini AI. Here's the summary of the dataset: {summary}.
+                    Try to make the report in bullet points and use numbers for better readability and understanding."""
+            response = model.generate_content(prompt, generation_config=config)
+            generated_report = response.text
+            st.write(generated_report)
+
+        # Generate Profile Report        
+        if st.button('Generate Profile Report'):
+            profile = ProfileReport(df, title="Pandas Profiling Report")
+            profile.to_file(f"reports/{filename.split('.')[0]}_report.html")
+            st.success("Profile Report generated successfully")
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
 def ai_recommendations():
