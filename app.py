@@ -177,20 +177,6 @@ def gemini_predict(predefined_prompt, file_path):
         st.error(e)
     return execution_code
 
-# Function for report generation
-def generate_report(file):
-    # Read CSV or Excel file
-    if file.name.endswith('.csv'):
-        df = pd.read_csv(file)
-    elif file.name.endswith('.xlsx'):
-        df = pd.read_excel(file)
-    # Generate profiling report
-    profile = ProfileReport(df, title="Dataset Report", explorative=True)
-    # Save the report as an HTML file
-    output_path = os.path.join("reports", f"{file.name.split('.')[0]}_report.html")
-    profile.to_file(output_path)
-    return output_path
-
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
     st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
@@ -465,7 +451,6 @@ def analysis_report():
         st.success("File uploaded successfully!")
         if df is not None:
             # Gemini Text Report Generation
-            st.subheader('Text Report Using AI')
             summary = df.describe().transpose().to_string()
             prompt = f"""Generate a text report for {filename} dataset using Gemini AI. Here's the summary of the dataset: {summary}.
                     Try to make the report in bullet points and use numbers for better readability and understanding."""
