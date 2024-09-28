@@ -177,6 +177,17 @@ def gemini_predict(predefined_prompt, file_path):
         st.error(e)
     return execution_code
 
+# Function for generating report
+def generate_report(df,file):
+    # Generate profiling report
+    profile = ProfileReport(df, title="Dataset Report", explorative=True)
+
+    # Save the report as an HTML file
+    output_path = os.path.join("reports", f"{file.name.split('.')[0]}_report.html")
+    profile.to_file(output_path)
+
+    return output_path
+
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
     st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
@@ -458,11 +469,15 @@ def analysis_report():
             generated_report = response.text
             st.write(generated_report)
 
-        # Generate Profile Report        
-        if st.button('Generate Profile Report'):
-            profile = ProfileReport(df, title="Pandas Profiling Report")
-            profile.to_file(f"reports/{filename.split('.')[0]}_report.html")
-            st.success("Profile Report generated successfully")
+        report_path = generate_report(df, uploaded_file)
+        with open(report_path, 'rb') as f:
+            st.download_button(
+                label="Download Report",
+                data=f,
+                file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
+                mime="text/html"
+            )
+            st.success("Report downloaded successfully!")
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
 def ai_recommendations():
