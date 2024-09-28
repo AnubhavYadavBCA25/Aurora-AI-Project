@@ -3,7 +3,6 @@ numpy==2.0.0
 scikit-learn
 matplotlib
 seaborn
-plotly
 streamlit==1.38.0
 google-generativeai
 streamlit-authenticator
@@ -12,3 +11,6 @@ python-dotenv
 streamlit-lottie
 xgboost
 ydata-profiling
+langchain
+langchain_community
+langchain-google-genai
