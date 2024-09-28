@@ -213,7 +213,7 @@ def introduction():
                     - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
                     - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
                     - **PredictEase:** A feature for predictive analysis. Where you can predict the target variable using different algorithms.
-                    - **Analysis Report**
+                    - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
                     - **AI Recommendations**''')
     with left_column:
         features = load_lottie_file('animations/features.json')
@@ -477,11 +477,11 @@ def analysis_report():
                 file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
                 mime="text/html"
             )
-            st.success("Report downloaded successfully!")
+    st.success("Report generated successfully!")
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
 def ai_recommendations():
-    st.header('AI Recommendations', divider='rainbow')
+    st.header('🤖SmartQuery: AI Powered Dataset Recommendations', divider='rainbow')
 
 #----------------------------- About Us -----------------------------#
 def about_us():
@@ -528,7 +528,7 @@ if st.session_state["authentication_status"]:
         st.Page(data_visualization, title='AutoViz', icon='📈'),
         st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
         st.Page(analysis_report, title='InsightGen', icon='📑'),
-        st.Page(ai_recommendations, title='AI Recommendations', icon='🤖'),
+        st.Page(ai_recommendations, title='SmartQuery', icon='🤖'),
         st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
     pg.run()
