@@ -6,9 +6,8 @@ import streamlit as st
 # import streamlit_lottie as st_lottie
 # from ydata_profiling import ProfileReport
 import pandas as pd
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
+import csv
+from pathlib import Path
 
 load_dotenv()
 
@@ -53,9 +52,6 @@ config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=1000)
 
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-upload_file = st.file_uploader("Upload a file", type=["csv", "txt"])
-question = st.text_input("Ask a question")
-
 def upload_to_gemini(path, mime_type=None):
   file = genai.upload_file(path, mime_type=mime_type)
   print(f"Uploaded file '{file.display_name}' as: {file.uri}")
@@ -71,7 +67,8 @@ def wait_for_files_active(files):
   This implementation uses a simple blocking polling loop. Production code
   should probably employ a more sophisticated approach.
   """
-  st.write("Waiting for file processing...")
+  with st.spinner("Waiting for file processing..."):
+    time.sleep(5)
   for name in (file.name for file in files):
     file = genai.get_file(name)
     while file.state.name == "PROCESSING":
@@ -80,8 +77,17 @@ def wait_for_files_active(files):
       file = genai.get_file(name)
     if file.state.name != "ACTIVE":
       raise Exception(f"File {file.name} failed to process")
-  st.write("...all files ready")
-  print()
+  # print("...all files ready")
+  # print()
+
+def extract_csv_data(pathname: str) -> list[str]:
+  parts = [f"---START OF CSV ${pathname} ---"]
+  with open(pathname, "r", newline="") as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+      str=" "
+      parts.append(str.join(row))
+  return parts
 
 # Create the model
 generation_config = {
@@ -99,35 +105,29 @@ model = genai.GenerativeModel(
   # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
+# upload_file = st.file_uploader("Upload a file", type=["csv", "txt"],key="file")
+question = "Tell me the data of the row where Id is 100."
 # TODO Make these files available on the local file system
 # You may need to update the file paths
-if upload_file is not None:
-    filename = upload_file.name
-    files = [
+filename = 'Iris.csv'
+
+# filename = upload_file.name
+files = [
     upload_to_gemini(filename, mime_type="text/csv"),
     ]
 
     # Some files have a processing delay. Wait for them to be ready.
-    wait_for_files_active(files)
+wait_for_files_active(files)
 
-    chat_session = model.start_chat(
-    history=[
-        {
-        "role": "user",
-        "parts": [
-            files[0],
-            "What content is in this file?",
-        ],
-        },
-        {
-        "role": "model",
-        "parts": [
-            "The file \"Iris.csv\" contains data about 150 iris flowers. Each row represents a single flower, and the columns describe its characteristics:\n\n* **Id**: A unique identifier for each flower.\n* **SepalLengthCm**: The sepal length in centimeters.\n* **SepalWidthCm**: The sepal width in centimeters.\n* **PetalLengthCm**: The petal length in centimeters.\n* **PetalWidthCm**: The petal width in centimeters.\n* **Species**: The species of iris, which can be one of three: Iris-setosa, Iris-versicolor, or Iris-virginica. \n\nThis dataset is a classic example of a machine learning dataset, often used to demonstrate classification algorithms.  \n",
-        ],
-        },
-    ]
-    )
+chat_session = model.start_chat(
+  history=[
+    {
+      "role":"user",
+      "parts":extract_csv_data(filename)
+    },
+  ]
+)
 
-    response = chat_session.send_message(question)
+response = chat_session.send_message(question)
 
-    st.write(response.text)
+st.write(response.text)

@@ -1,4 +1,7 @@
 import os
+import time
+import csv
+from pathlib import Path
 import yaml
 import json
 import pandas as pd
@@ -117,6 +120,14 @@ genai_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
 config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=1500)
+config_for_chatbot = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain"
+}
+model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generation_config=config_for_chatbot)
 
 #----------------------------- Functions -----------------------------#
 # Function for loading csv format file
@@ -185,8 +196,35 @@ def generate_report(df,file):
     # Save the report as an HTML file
     output_path = os.path.join("reports", f"{file.name.split('.')[0]}_report.html")
     profile.to_file(output_path)
-
     return output_path
+
+# Function for uploading file to Gemini
+def upload_to_gemini(path, mime_type=None):
+    file = genai.upload_file(path, mime_type=mime_type)
+    print(f"Uploaded file '{file.display_name}' as: {file.uri}")
+    return file
+
+def wait_for_files_active(files):
+    st.write("Waiting for file processing...")
+    for name in (file.name for file in files):
+        file = genai.get_file(name)
+        while file.state.name == "PROCESSING":
+            print(".", end="", flush=True)
+            time.sleep(10)
+            file = genai.get_file(name)
+            if file.state.name != "ACTIVE":
+                raise Exception(f"File {file.name} failed to process")
+    st.write("...all files ready")
+    print()
+
+def extract_csv_data(pathname: str) -> list[str]:
+  parts = [f"---START OF CSV ${pathname} ---"]
+  with open(pathname, "r", newline="") as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+      str=" "
+      parts.append(str.join(row))
+  return parts
 
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
@@ -480,8 +518,37 @@ def analysis_report():
     st.success("Report generated successfully!")
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
-def ai_recommendations():
-    st.header('🤖SmartQuery: AI Powered Dataset Recommendations', divider='rainbow')
+def ai_data_file_chatbot():
+    st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
+    st.write('Upload a dataset to chat with data file:')
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    question = 'Tell me about dataset'
+    
+    if uploaded_file and question is not None:
+        st.success("File uploaded successfully!")
+        file_name = uploaded_file.name
+        # Get file path
+        # For demonstration, saving the uploaded file temporarily (optional)
+        file_path = os.path.join(os.getcwd(), file_name)
+        with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        st.write(file_name)
+        files = [upload_to_gemini(file_name, mime_type="text/csv")]
+        wait_for_files_active(files)
+
+        chat_session = model.start_chat(
+        history=[
+            {
+            "role":"user",
+            "parts":extract_csv_data(file_name)
+            },
+        ]
+        )
+        response = chat_session.send_message(question)
+        st.write(response.text)
+
+
+
 
 #----------------------------- About Us -----------------------------#
 def about_us():
@@ -528,7 +595,7 @@ if st.session_state["authentication_status"]:
         st.Page(data_visualization, title='AutoViz', icon='📈'),
         st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
         st.Page(analysis_report, title='InsightGen', icon='📑'),
-        st.Page(ai_recommendations, title='SmartQuery', icon='🤖'),
+        st.Page(ai_data_file_chatbot, title='SmartQuery', icon='🤖'),
         st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
     pg.run()

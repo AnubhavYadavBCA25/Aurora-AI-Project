@@ -11,6 +11,3 @@ python-dotenv
 streamlit-lottie
 xgboost
 ydata-profiling
-langchain
-langchain_community
-langchain-google-genai
