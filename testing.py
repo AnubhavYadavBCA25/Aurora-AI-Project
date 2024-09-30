@@ -67,8 +67,8 @@ def wait_for_files_active(files):
   This implementation uses a simple blocking polling loop. Production code
   should probably employ a more sophisticated approach.
   """
-  with st.spinner("Waiting for file processing..."):
-    time.sleep(5)
+  # with st.spinner("File Processing..."):
+  #   time.sleep(5)
   for name in (file.name for file in files):
     file = genai.get_file(name)
     while file.state.name == "PROCESSING":
@@ -105,29 +105,53 @@ model = genai.GenerativeModel(
   # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
-# upload_file = st.file_uploader("Upload a file", type=["csv", "txt"],key="file")
-question = "Tell me the data of the row where Id is 100."
-# TODO Make these files available on the local file system
-# You may need to update the file paths
-filename = 'Iris.csv'
+upload_file = st.file_uploader("Upload a file", type=["csv", "txt"],key="file")
+if upload_file is not None:
+        st.success("File Uploaded Successfully")
+        question = st.text_input("Ask a question:")
+        if st.button("Process and Ask"):
+          file_name = upload_file.name
+          # Get file path
+          # For demonstration, saving the uploaded file temporarily (optional)
+          file_path = os.path.join(os.getcwd(), file_name)
+          with open(file_path, "wb") as f:
+              f.write(upload_file.getbuffer())
+          files = [upload_to_gemini(file_name, mime_type="text/csv")]
+          wait_for_files_active(files)
+          chat_session = model.start_chat(
+          history=[
+              {
+              "role":"user",
+              "parts":extract_csv_data(file_name)
+              },
+          ]
+          )
+          response = chat_session.send_message(question)
+          st.write(response.text)
+# if upload_file is not None:
+#         filename = upload_file.name
+#         file_path = os.path.join(os.getcwd(), filename)
+#         with open(file_path, "wb") as f:
+#             f.write(upload_file.getbuffer())
+#         if st.button("Submit and Process"):
+#            with st.spinner("Processing..."):
+#               files = [
+#                   upload_to_gemini(file_path, mime_type="text/csv"),
+#                   ]
+#               wait_for_files_active(files)
+#               st.success("File Processed Successfully")
+#               question = st.text_input("Ask a question", "Tell me the data of the row where Id is 100.")
+#               if st.button("Ask"):
+#                 chat_session = model.start_chat(
+#                   history=[
+#                       {
+#                           "role": "user",
+#                           "parts": extract_csv_data(filename),
+#                       },
+#                   ]
+#               )
 
-# filename = upload_file.name
-files = [
-    upload_to_gemini(filename, mime_type="text/csv"),
-    ]
+#                 response = chat_session.send_message(question)
 
-    # Some files have a processing delay. Wait for them to be ready.
-wait_for_files_active(files)
-
-chat_session = model.start_chat(
-  history=[
-    {
-      "role":"user",
-      "parts":extract_csv_data(filename)
-    },
-  ]
-)
-
-response = chat_session.send_message(question)
-
-st.write(response.text)
+#                 st.write(response.text)
+#                 st.success("Done")
