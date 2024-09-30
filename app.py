@@ -1,7 +1,6 @@
 import os
 import time
 import csv
-from pathlib import Path
 import yaml
 import json
 import pandas as pd
@@ -205,7 +204,6 @@ def upload_to_gemini(path, mime_type=None):
     return file
 
 def wait_for_files_active(files):
-    st.write("Waiting for file processing...")
     for name in (file.name for file in files):
         file = genai.get_file(name)
         while file.state.name == "PROCESSING":
@@ -214,8 +212,6 @@ def wait_for_files_active(files):
             file = genai.get_file(name)
             if file.state.name != "ACTIVE":
                 raise Exception(f"File {file.name} failed to process")
-    st.write("...all files ready")
-    print()
 
 def extract_csv_data(pathname: str) -> list[str]:
   parts = [f"---START OF CSV ${pathname} ---"]
@@ -233,15 +229,15 @@ def introduction():
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Introduction")
-        st.markdown('''**Aurora AI:** An Advanced Automation using AI for Complex Data Analysis is a web-based application developed 
-                    to automate the intricate process of data analysis using cutting-edge AI and machine learning technologies. With a 
-                    user-friendly interface, Aurora allows users to upload datasets and perform tasks like data cleaning, visualization, and 
-                    predictive modeling, all with minimal manual intervention. The platform is designed to save time and effort, delivering 
-                    actionable insights through automated processes that typically require advanced data science skills. Whether you're handling
-                     small datasets or large, complex ones, Aurora simplifies the workflow, making data-driven decision-making faster and more 
-                    efficient.''')
+        st.markdown('''
+                    - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, predictive analysis, automated data report generation, and AI-powered dataset chatbot.
+                    - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
+                    - The tool is built using Python, Streamlit, and Gemini API for AI-powered content generation.
+                    - It offers a wide range of features to help users explore, analyze, and gain insights from their data.
+                    - The tool is equipped with AI models that can generate data visualizations, predictive analysis models, and automated data report generation based on user input.
+    ''')
     with right_column:
-        st_lottie.st_lottie(robot_file, key='robot', height=400, width=400 ,loop=True)
+        st_lottie.st_lottie(robot_file, key='robot', height=450, width=450 ,loop=True)
     st.divider()
 
     left_column, right_column = st.columns(2)
@@ -252,10 +248,10 @@ def introduction():
                     - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
                     - **PredictEase:** A feature for predictive analysis. Where you can predict the target variable using different algorithms.
                     - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
-                    - **AI Recommendations**''')
+                    - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.''')
     with left_column:
         features = load_lottie_file('animations/features.json')
-        st_lottie.st_lottie(features, key='features', height=300, width=300 ,loop=True)
+        st_lottie.st_lottie(features, key='features', height=350, width=350 ,loop=True)
     st.divider()
 
     left_column, right_column = st.columns(2)
@@ -278,8 +274,8 @@ def introduction():
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
 def statistical_analysis():
     st.header('🧹CleanStats: Cleaning & Statistical Analysis', divider='rainbow')
-    
     # Upload dataset
+    st.write('Upload a dataset for cleaning and statistical analysis:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
 
     if uploaded_file is not None:
@@ -330,6 +326,7 @@ def statistical_analysis():
 #----------------------------- Page 2: Data Visualization -----------------------------#
 def data_visualization():
     st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
+    # Upload dataset
     st.write('Upload a dataset to visualize:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
     
@@ -389,6 +386,7 @@ def data_visualization():
 #----------------------------- Page 3: Predictive Analysis -----------------------------#
 def predictive_analysis():
     st.header('🔮PredictEase: Predictive Analysis', divider='rainbow')
+    # Upload dataset
     st.write('Upload a dataset to predict:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
     if uploaded_file is not None:
@@ -492,6 +490,7 @@ def predictive_analysis():
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():
     st.header('📑InsightGen: Automated Data Report Generator', divider='rainbow')
+    # Upload dataset
     st.write('Upload a dataset to generate a report:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
     if uploaded_file is not None:
@@ -506,7 +505,9 @@ def analysis_report():
             response = model.generate_content(prompt, generation_config=config)
             generated_report = response.text
             st.write(generated_report)
+            st.success("Report generated successfully!")
 
+        # Generate a report in HTML format for download
         report_path = generate_report(df, uploaded_file)
         with open(report_path, 'rb') as f:
             st.download_button(
@@ -515,49 +516,58 @@ def analysis_report():
                 file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
                 mime="text/html"
             )
-    st.success("Report generated successfully!")
 
 #----------------------------- Page 5: AI Recommendations -----------------------------#
 def ai_data_file_chatbot():
     st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
+    # Upload dataset
     st.write('Upload a dataset to chat with data file:')
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
-    question = 'Tell me about dataset'
-    
-    if uploaded_file and question is not None:
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv"])
+    if uploaded_file is not None:
         st.success("File uploaded successfully!")
-        file_name = uploaded_file.name
-        # Get file path
-        # For demonstration, saving the uploaded file temporarily (optional)
-        file_path = os.path.join(os.getcwd(), file_name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.write(file_name)
-        files = [upload_to_gemini(file_name, mime_type="text/csv")]
-        wait_for_files_active(files)
+        # Get the user question
+        question = st.text_input("Ask a question:", key="question")
+        if st.button("Submit"):
+            with st.spinner("Generating response..."):
+                file_name = uploaded_file.name
+                file_path = os.path.join(os.getcwd(), file_name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
 
-        chat_session = model.start_chat(
-        history=[
-            {
-            "role":"user",
-            "parts":extract_csv_data(file_name)
-            },
-        ]
-        )
-        response = chat_session.send_message(question)
-        st.write(response.text)
-
-
-
+                # Upload the file to Gemini and wait for it to be active
+                files = [upload_to_gemini(file_name, mime_type="text/csv")]
+                wait_for_files_active(files)
+                # Start a chat session with the uploaded file
+                chat_session = model.start_chat(
+                history=[
+                    {
+                    "role":"user",
+                    "parts":extract_csv_data(file_name)
+                    },
+                ]
+                )
+                # Send the user question to the chatbot for response
+                response = chat_session.send_message(question)
+                st.write(response.text)
 
 #----------------------------- About Us -----------------------------#
 def about_us():
-    st.header('👨‍💻About Us', divider='rainbow')
+    st.header('👨‍💻About Us: Meet Team Aurora', divider='rainbow')
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Anubhav Yadav")
+        st.markdown('''
+                    - **Role:** Lead Developer
+                    - **Email:** yadavanubhav2024@gmail.com
+                    - **LinkedIn:** [Anubhav Yadav LinkedIn](https://www.linkedin.com/in/anubhav-yadav-data-science/)
+                    - **GitHub:** [Anubhav Yadav GitHub](https://www.github.com/AnubhavYadavBCA25)
+                    - **Bio:** Anubhav is a Data Science enthusiast with a passion for building AI-powered applications. He is skilled in 
+                            Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
+                            specializing in Data Science.
+                    ''')
     with right_column:
-        pass # Profile picture
+        anubhav_profile = load_lottie_file('profile_animations/anubhav_profile.json')
+        st_lottie.st_lottie(anubhav_profile, key='anubhav', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
     left_column, right_column = st.columns(2)

@@ -7,7 +7,7 @@ import streamlit as st
 # from ydata_profiling import ProfileReport
 import pandas as pd
 import csv
-from pathlib import Path
+from PyPDF2 import PdfReader
 
 load_dotenv()
 
@@ -89,6 +89,15 @@ def extract_csv_data(pathname: str) -> list[str]:
       parts.append(str.join(row))
   return parts
 
+def extract_pdf_data(pathname: str) -> list[str]:
+  parts = [f"---START OF PDF ${pathname} ---"]
+  with open(pathname, "rb") as file:
+     reader = PdfReader(file)
+     for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        parts.append(f"--- Page {page_num} ---")
+        parts.append(page.extract_text())
+  return parts
 # Create the model
 generation_config = {
   "temperature": 1,
@@ -105,53 +114,28 @@ model = genai.GenerativeModel(
   # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
-upload_file = st.file_uploader("Upload a file", type=["csv", "txt"],key="file")
+upload_file = st.file_uploader("Upload a file", type=["csv","pdf"],key="file")
 if upload_file is not None:
         st.success("File Uploaded Successfully")
         question = st.text_input("Ask a question:")
         if st.button("Process and Ask"):
-          file_name = upload_file.name
-          # Get file path
-          # For demonstration, saving the uploaded file temporarily (optional)
-          file_path = os.path.join(os.getcwd(), file_name)
-          with open(file_path, "wb") as f:
-              f.write(upload_file.getbuffer())
-          files = [upload_to_gemini(file_name, mime_type="text/csv")]
-          wait_for_files_active(files)
-          chat_session = model.start_chat(
-          history=[
-              {
-              "role":"user",
-              "parts":extract_csv_data(file_name)
-              },
-          ]
-          )
-          response = chat_session.send_message(question)
-          st.write(response.text)
-# if upload_file is not None:
-#         filename = upload_file.name
-#         file_path = os.path.join(os.getcwd(), filename)
-#         with open(file_path, "wb") as f:
-#             f.write(upload_file.getbuffer())
-#         if st.button("Submit and Process"):
-#            with st.spinner("Processing..."):
-#               files = [
-#                   upload_to_gemini(file_path, mime_type="text/csv"),
-#                   ]
-#               wait_for_files_active(files)
-#               st.success("File Processed Successfully")
-#               question = st.text_input("Ask a question", "Tell me the data of the row where Id is 100.")
-#               if st.button("Ask"):
-#                 chat_session = model.start_chat(
-#                   history=[
-#                       {
-#                           "role": "user",
-#                           "parts": extract_csv_data(filename),
-#                       },
-#                   ]
-#               )
-
-#                 response = chat_session.send_message(question)
-
-#                 st.write(response.text)
-#                 st.success("Done")
+          with st.spinner("Processing..."):
+            file_name = upload_file.name
+            # st.write(f"File Name: {file_name}")
+            # Get file path
+            # For demonstration, saving the uploaded file temporarily (optional)
+            file_path = os.path.join(os.getcwd(), file_name)
+            with open(file_path, "wb") as f:
+                f.write(upload_file.getbuffer())
+            files = [upload_to_gemini(file_name, mime_type="application/pdf")]
+            wait_for_files_active(files)
+            chat_session = model.start_chat(
+              history=[
+                  {
+                  "role":"user",
+                  "parts":extract_csv_data(file_name)
+                  },
+              ]
+              )
+            response = chat_session.send_message(question)
+            st.write(response.text)
