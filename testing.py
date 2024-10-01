@@ -8,6 +8,9 @@ import streamlit as st
 import pandas as pd
 import csv
 from PyPDF2 import PdfReader
+import pyttsx3
+from gtts import gTTS
+import threading
 
 load_dotenv()
 
@@ -114,28 +117,65 @@ model = genai.GenerativeModel(
   # See https://ai.google.dev/gemini-api/docs/safety-settings
 )
 
-upload_file = st.file_uploader("Upload a file", type=["csv","pdf"],key="file")
-if upload_file is not None:
-        st.success("File Uploaded Successfully")
-        question = st.text_input("Ask a question:")
-        if st.button("Process and Ask"):
-          with st.spinner("Processing..."):
-            file_name = upload_file.name
-            # st.write(f"File Name: {file_name}")
-            # Get file path
-            # For demonstration, saving the uploaded file temporarily (optional)
-            file_path = os.path.join(os.getcwd(), file_name)
-            with open(file_path, "wb") as f:
-                f.write(upload_file.getbuffer())
-            files = [upload_to_gemini(file_name, mime_type="application/pdf")]
-            wait_for_files_active(files)
-            chat_session = model.start_chat(
-              history=[
-                  {
-                  "role":"user",
-                  "parts":extract_csv_data(file_name)
-                  },
-              ]
-              )
-            response = chat_session.send_message(question)
-            st.write(response.text)
+# upload_file = st.file_uploader("Upload a file", type=["csv","pdf"],key="file")
+# if upload_file is not None:
+#         st.success("File Uploaded Successfully")
+#         question = st.text_input("Ask a question:")
+#         if st.button("Process and Ask"):
+#           with st.spinner("Processing..."):
+#             file_name = upload_file.name
+#             # st.write(f"File Name: {file_name}")
+#             # Get file path
+#             # For demonstration, saving the uploaded file temporarily (optional)
+#             file_path = os.path.join(os.getcwd(), file_name)
+#             with open(file_path, "wb") as f:
+#                 f.write(upload_file.getbuffer())
+#             files = [upload_to_gemini(file_name, mime_type="application/pdf")]
+#             wait_for_files_active(files)
+#             chat_session = model.start_chat(
+#               history=[
+#                   {
+#                   "role":"user",
+#                   "parts":extract_csv_data(file_name)
+#                   },
+#               ]
+#               )
+#             response = chat_session.send_message(question)
+#             st.write(response.text)
+
+# Function to generate and save TTS audio file
+def generate_tts(text, file_name):
+    tts = gTTS(text, lang="en", tld="co.in")
+    tts.save(file_name)
+    return file_name
+
+# Introduction and Features text
+intro_text = "Welcome to Aurora. Aurora is an advanced AI-powered tool for automating complex data analysis."
+feature_text = """
+Our features include:
+1. CleanStats: Automated data cleaning and basic statistical analysis.
+2. InsightGen: Automated data visualization and exploratory data analysis.
+3. PredictIQ: Automated machine learning predictions and model export.
+4. InsightGen Report: Generates an analysis report based on your dataset.
+5. SmartRecs: AI-powered recommendations and data interaction via natural language.
+"""
+
+# Streamlit web app UI
+st.title("Aurora AI: Text-to-Speech Feature Test")
+
+hearder = st.header("Introduction")
+st.write(intro_text)
+
+st.header("Features")
+st.write(feature_text)
+
+# Button to speak the introduction and features section
+with st.sidebar:
+  if st.button("Play"):
+      with st.spinner("Processing..."):
+          # Generate TTS audio file
+          audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
+          # Play the audio file
+          audio = open(audio_file, "rb")
+          audio_bytes = audio.read()
+          st.audio(audio_bytes, format="audio/mp3", autoplay=True, start_time=0)

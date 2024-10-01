@@ -3,6 +3,7 @@ import time
 import csv
 import yaml
 import json
+from gtts import gTTS
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -222,6 +223,12 @@ def extract_csv_data(pathname: str) -> list[str]:
       parts.append(str.join(row))
   return parts
 
+# Function to generate and save TTS audio file
+def generate_tts(text, file_name):
+    tts = gTTS(text, lang="en", tld="co.in")
+    tts.save(file_name)
+    return file_name
+
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
     st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
@@ -229,13 +236,15 @@ def introduction():
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Introduction")
-        st.markdown('''
+        intro_text = ('''
                     - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, predictive analysis, automated data report generation, and AI-powered dataset chatbot.
                     - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
                     - The tool is built using Python, Streamlit, and Gemini API for AI-powered content generation.
                     - It offers a wide range of features to help users explore, analyze, and gain insights from their data.
                     - The tool is equipped with AI models that can generate data visualizations, predictive analysis models, and automated data report generation based on user input.
-    ''')
+                ''')
+        st.markdown(intro_text)
+
     with right_column:
         st_lottie.st_lottie(robot_file, key='robot', height=450, width=450 ,loop=True)
     st.divider()
@@ -243,12 +252,14 @@ def introduction():
     left_column, right_column = st.columns(2)
     with right_column:
         st.subheader("Features:")
-        st.markdown('''
+        feature_text = ('''
                     - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
                     - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
                     - **PredictEase:** A feature for predictive analysis. Where you can predict the target variable using different algorithms.
                     - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
                     - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.''')
+        st.markdown(feature_text)
+    
     with left_column:
         features = load_lottie_file('animations/features.json')
         st_lottie.st_lottie(features, key='features', height=350, width=350 ,loop=True)
@@ -269,6 +280,14 @@ def introduction():
     with right_column:
         tech_used = load_lottie_file('animations/tech_used.json')
         st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
+
+    with st.sidebar:
+        if st.button("Introduce"):
+            # with st.spinner("Processing..."):
+            #     audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
+            #     audio = open(audio_file, "rb")
+            #     audio_bytes = audio.read()
+            st.audio('animations and audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
     st.divider()
 
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
@@ -561,7 +580,7 @@ def about_us():
                     - **Email:** yadavanubhav2024@gmail.com
                     - **LinkedIn:** [Anubhav Yadav LinkedIn](https://www.linkedin.com/in/anubhav-yadav-data-science/)
                     - **GitHub:** [Anubhav Yadav GitHub](https://www.github.com/AnubhavYadavBCA25)
-                    - **Bio:** Anubhav is a Data Science enthusiast with a passion for building AI-powered applications. He is skilled in 
+                    - **Bio:** Anubhav is a Data Science Enthusiast with a passion for building AI-powered applications. He is skilled in 
                             Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
                             specializing in Data Science.
                     ''')
@@ -588,7 +607,8 @@ def about_us():
     with right_column:
         st.subheader("Drishti Jaiswal")
     with left_column:
-        pass # Profile picture
+        drishti_profile = load_lottie_file('profile_animations/drishti_profile.json')
+        st_lottie.st_lottie(drishti_profile, key='drishti', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
     left_column, right_column = st.columns(2)
