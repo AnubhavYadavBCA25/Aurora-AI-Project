@@ -232,7 +232,7 @@ def generate_tts(text, file_name):
 #----------------------------- Introduction Page -----------------------------#
 def introduction():
     st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
-    robot_file = load_lottie_file('animations/robot.json')
+    robot_file = load_lottie_file('animations_and_audios/robot.json')
     left_column, right_column = st.columns(2)
     with left_column:
         st.subheader("Introduction")
@@ -261,7 +261,7 @@ def introduction():
         st.markdown(feature_text)
     
     with left_column:
-        features = load_lottie_file('animations/features.json')
+        features = load_lottie_file('animations_and_audios/features.json')
         st_lottie.st_lottie(features, key='features', height=350, width=350 ,loop=True)
     st.divider()
 
@@ -278,7 +278,7 @@ def introduction():
             - **Streamlit-Authenticator:** For handling user authentication, login, and registration.
             - **.env:** For securely storing environment variables like API keys and sensitive data.''')
     with right_column:
-        tech_used = load_lottie_file('animations/tech_used.json')
+        tech_used = load_lottie_file('animations_and_audios/tech_used.json')
         st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
 
     with st.sidebar:
@@ -287,7 +287,7 @@ def introduction():
             #     audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
             #     audio = open(audio_file, "rb")
             #     audio_bytes = audio.read()
-            st.audio('animations and audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
+            st.audio('animations_and_audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
     st.divider()
 
 #----------------------------- Page 1: Statistical Analysis -----------------------------#
@@ -307,8 +307,8 @@ def statistical_analysis():
 
             # Display dataset
             st.subheader("Dataset Preview:", divider='rainbow')
-            df_sample = df.head(5)
-            st.dataframe(df_sample)
+            st.dataframe(df)
+            st.write("*Note: The dataset has been cleaned and missing values have been imputed. You can download the cleaned dataset for further analysis.*")
         
             # Basic statistics
             st.subheader("Basic Statistics:", divider='rainbow')
@@ -574,15 +574,15 @@ def about_us():
     st.header('👨‍💻About Us: Meet Team Aurora', divider='rainbow')
     left_column, right_column = st.columns(2)
     with left_column:
-        st.subheader("Anubhav Yadav")
+        st.subheader("Anubhav Yadav", divider='rainbow')
         st.markdown('''
                     - **Role:** Lead Developer
-                    - **Email:** yadavanubhav2024@gmail.com
-                    - **LinkedIn:** [Anubhav Yadav LinkedIn](https://www.linkedin.com/in/anubhav-yadav-data-science/)
-                    - **GitHub:** [Anubhav Yadav GitHub](https://www.github.com/AnubhavYadavBCA25)
+                    - **Email:** [![Anubhav Email](https://img.icons8.com/color/30/email.png)](yadavanubhav2024@gmail.com)
+                    - **LinkedIn:** [![Anubhav Yadav LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/anubhav-yadav-data-science/)
+                    - **GitHub:** [![Anubhav Yadav GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://www.github.com/AnubhavYadavBCA25)
                     - **Bio:** Anubhav is a Data Science Enthusiast with a passion for building AI-powered applications. He is skilled in 
-                            Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
-                            specializing in Data Science.
+                                Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
+                                specializing in Data Science.
                     ''')
     with right_column:
         anubhav_profile = load_lottie_file('profile_animations/anubhav_profile.json')
@@ -591,21 +591,50 @@ def about_us():
 
     left_column, right_column = st.columns(2)
     with right_column:
-        st.subheader("Sparsh Jaiswal")
+        st.subheader("Sparsh Jaiswal", divider='rainbow')
+        st.markdown('''
+                    - **Role:** Developer
+                    - **Email:** [![Sparsh Email](https://img.icons8.com/color/30/email.png)](sparshjaiswal10@gmail.com)
+                    - **LinkedIn:** [![Sparsh Jaiswal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://http://www.linkedin.com/in/sparsh-jaiswal-aa903730b/)
+                    - **GitHub:** [![Sparsh Jaiswal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/sparshjais)
+                    - **Bio:** Sparsh Jaiswal is a passionate AI developer and ML enthusiast, currently pursuing a BCA in Data Science. 
+                        With a strong foundation in python and front-end development, Sparsh is dedicated to blending the power of AI with 
+                        intuitive web design to craft seamless and engaging user experiences.
+                    ''')
     with left_column:
-        pass # Profile picture
+        sparsh_profile = load_lottie_file('profile_animations/sparsh_profile.json')
+        st_lottie.st_lottie(sparsh_profile, key='sparsh', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
     left_column, right_column = st.columns(2)
     with left_column:
-        st.subheader("Eshaan Sabharwal")
+        st.subheader("Eshaan Sabharwal", divider='rainbow')
+        st.markdown('''
+                    - **Role:** Developer
+                    - **Email:** [![Eshaan Email](https://img.icons8.com/color/30/email.png)](eshaansabharwal@gmail.com)
+                    - **LinkedIn:** [![Eshaan Sabharwal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/eshaan-sabharwal-b73a201b2)
+                    - **GitHub:** [![Eshaan Sabharwal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/EshaanSabharwal)
+                    - **Bio:** Eshaan Sabharwal is an aspiring AI developer and web enthusiast pursuing a BCA in Data Science. 
+                        Skilled in front-end development and eager to integrate AI into web applications, Eshaan combines technical 
+                        expertise with a passion for innovation to create user-friendly digital experiences.
+                    ''')
     with right_column:
-        pass # Profile picture
+        eshaan_profile = load_lottie_file('profile_animations/eshaan_profile.json')
+        st_lottie.st_lottie(eshaan_profile, key='eshaan', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
     left_column, right_column = st.columns(2)
     with right_column:
-        st.subheader("Drishti Jaiswal")
+        st.subheader("Drishti Jaiswal", divider='rainbow')
+        st.markdown('''
+                    - **Role:** Developer
+                    - **Email:** [![Drishti Email](https://img.icons8.com/color/30/email.png)](Drishti.jaiswal111@gmail.com)
+                    - **LinkedIn:** [![Drishti Jaiswal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](http://linkedin.com/in/drishti-jaiswal-40331627b)
+                    - **GitHub:** [![Drishti Jaiswal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/drishti-jaiswal)
+                    - **Bio:** Drishti Jaiswal is a data science student at SRM Institute, skilled in Python and machine learning. 
+                        With certifications in data analytics, she's passionate about applying her knowledge to innovative projects in 
+                        the field. She's dedicated to creating impactful solutions that leverage the power of AI to drive change.
+                    ''')
     with left_column:
         drishti_profile = load_lottie_file('profile_animations/drishti_profile.json')
         st_lottie.st_lottie(drishti_profile, key='drishti', height=305, width=305 ,loop=True, quality='high')
@@ -613,10 +642,31 @@ def about_us():
 
     left_column, right_column = st.columns(2)
     with left_column:
-        st.subheader("Satyam Kumar")
+        st.subheader("Satyam Kumar", divider='rainbow')
+        st.markdown('''
+                    - **Role:** Developer
+                    - **Email:** [![Satyam Email](https://img.icons8.com/color/30/email.png)](iamsatyam9798@gmail.com)
+                    - **LinkedIn:** [![Satyam Kumar LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/satyam-kumar-63419a251/)
+                    - **GitHub:** [![Satyam Kumar GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/satyamkr21)
+                    - **Bio:** Satyam Kumar, an AI developer and ML enthusiast, pursuing BCA in Data Science, blends AI with intuitive 
+                        web design to create seamless user experiences, driven by innovation and a passion for impactful solutions.
+                        He is skilled in mantaining the content and design of the website.
+                    ''')
     with right_column:
-        pass # Profile picture
+        satyam_profile = load_lottie_file('profile_animations/satyam_profile.json')
+        st_lottie.st_lottie(satyam_profile, key='satyam', height=305, width=305 ,loop=True, quality='high')
     st.divider()
+
+    # Footer
+    st.markdown(
+    """
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <div style="text-align:center;">
+        <p>Made with ❤️ by Team Aurora @2024</p>
+    </div>
+    """, unsafe_allow_html=True
+)
+
 #----------------------------- Navigation -----------------------------#
 if st.session_state["authentication_status"]:
     pg = st.navigation([

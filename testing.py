@@ -144,38 +144,103 @@ model = genai.GenerativeModel(
 #             st.write(response.text)
 
 # Function to generate and save TTS audio file
-def generate_tts(text, file_name):
-    tts = gTTS(text, lang="en", tld="co.in")
-    tts.save(file_name)
-    return file_name
+# def generate_tts(text, file_name):
+#     tts = gTTS(text, lang="en", tld="co.in")
+#     tts.save(file_name)
+#     return file_name
 
-# Introduction and Features text
-intro_text = "Welcome to Aurora. Aurora is an advanced AI-powered tool for automating complex data analysis."
-feature_text = """
-Our features include:
-1. CleanStats: Automated data cleaning and basic statistical analysis.
-2. InsightGen: Automated data visualization and exploratory data analysis.
-3. PredictIQ: Automated machine learning predictions and model export.
-4. InsightGen Report: Generates an analysis report based on your dataset.
-5. SmartRecs: AI-powered recommendations and data interaction via natural language.
-"""
+# # Introduction and Features text
+# intro_text = "Welcome to Aurora. Aurora is an advanced AI-powered tool for automating complex data analysis."
+# feature_text = """
+# Our features include:
+# 1. CleanStats: Automated data cleaning and basic statistical analysis.
+# 2. InsightGen: Automated data visualization and exploratory data analysis.
+# 3. PredictIQ: Automated machine learning predictions and model export.
+# 4. InsightGen Report: Generates an analysis report based on your dataset.
+# 5. SmartRecs: AI-powered recommendations and data interaction via natural language.
+# """
 
-# Streamlit web app UI
-st.title("Aurora AI: Text-to-Speech Feature Test")
+# # Streamlit web app UI
+# st.title("Aurora AI: Text-to-Speech Feature Test")
 
-hearder = st.header("Introduction")
-st.write(intro_text)
+# hearder = st.header("Introduction")
+# st.write(intro_text)
 
-st.header("Features")
-st.write(feature_text)
+# st.header("Features")
+# st.write(feature_text)
 
-# Button to speak the introduction and features section
-with st.sidebar:
-  if st.button("Play"):
-      with st.spinner("Processing..."):
-          # Generate TTS audio file
-          audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
-          # Play the audio file
-          audio = open(audio_file, "rb")
-          audio_bytes = audio.read()
-          st.audio(audio_bytes, format="audio/mp3", autoplay=True, start_time=0)
+# # Button to speak the introduction and features section
+# with st.sidebar:
+#   if st.button("Play"):
+#       with st.spinner("Processing..."):
+#           # Generate TTS audio file
+#           audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
+#           # Play the audio file
+#           audio = open(audio_file, "rb")
+#           audio_bytes = audio.read()
+#           st.audio(audio_bytes, format="audio/mp3", autoplay=True, start_time=0)
+
+# Testing About Us Page
+# Define Font Awesome icons with hyperlinks
+def social_icons(email, linkedin, github):
+    return f"""
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <p>
+        <a href="mailto:{email}" target="_blank">
+            <img src="https://img.icons8.com/ios-glyphs/30/000000/email.png" alt="Email Icon" style="margin-right: 10px;">
+        </a>
+        
+        <a href="{linkedin}" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+        
+        <a href="{github}" target="_blank">
+            <img src="https://img.icons8.com/ios-glyphs/30/000000/github.png" alt="GitHub Icon" style="margin-right: 10px;">
+        </a>
+    </p>
+    """
+
+# Define a function to display team member details
+def display_member(role, email, linkedin, github, bio):
+    st.markdown(f"""
+    - **Role:** {role}
+    - **Email:** {email}
+    - **LinkedIn:** {linkedin}
+    - **GitHub:** {github}
+    - **Bio:** {bio}
+    """, unsafe_allow_html=True)
+    
+    # Display the social icons
+    st.markdown(social_icons(email, linkedin, github), unsafe_allow_html=True)
+
+# Example team member data
+members = [
+    {
+        "name": "Anubhav Yadav",
+        "role": "Project Lead",
+        "email": "anubhav@example.com",
+        "linkedin": "https://www.linkedin.com/in/anubhav-yadav/",
+        "github": "https://github.com/anubhav-yadav",
+        "bio": "Anubhav is a passionate data scientist leading the Aurora project."
+    },
+    {
+        "name": "John Doe",
+        "role": "Data Analyst",
+        "email": "john@example.com",
+        "linkedin": "https://www.linkedin.com/in/johndoe/",
+        "github": "https://github.com/johndoe",
+        "bio": "John is a data enthusiast specializing in predictive modeling."
+    }
+]
+
+# About Us Section
+st.title("About Us")
+
+# Loop through each member and display their info
+for member in members:
+    display_member(member['role'], member['email'], member['linkedin'], member['github'], member['bio'])
+    st.markdown("---")
+
+st.markdown('''
+<a href="https://www.linkedin.com/in/yourlinkedin/" target="_blank">
+    <img src="https://img.icons8.com/color/75/linkedin.png" alt="LinkedIn Icon" style="margin-right: 10px;">
+</a>
+''', unsafe_allow_html=True)
