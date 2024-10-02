@@ -3,6 +3,7 @@ import time
 import csv
 import yaml
 import json
+from PIL import Image
 from gtts import gTTS
 import pandas as pd
 import numpy as np
@@ -26,7 +27,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-#----------------------------- User Authentication -----------------------------#
+###################################################### User Authentication ######################################################
 
 # Loading config file
 with open('config.yaml', 'r', encoding='utf-8') as file:
@@ -104,7 +105,7 @@ if st.session_state['register']:
 else:
     show_login_form()  # Show login form
 
-#-------------------------------- AI Models -----------------------------------#
+###################################################### AI Models ######################################################
 # Gemini API
 load_dotenv()
 genai_api_key = os.getenv("GEMINI_API_KEY")
@@ -120,7 +121,7 @@ config_for_chatbot = {
 }
 model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generation_config=config_for_chatbot)
 
-#----------------------------- Functions -----------------------------#
+###################################################### Functions ######################################################
 # Function for loading csv format file
 def load_csv_format(file):
         df = pd.read_csv(file)
@@ -204,7 +205,7 @@ def generate_tts(text, file_name):
     tts.save(file_name)
     return file_name
 
-#----------------------------- Introduction Page -----------------------------#
+###################################################### Page 1: Introduction Page ######################################################
 def introduction():
     st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
     robot_file = load_lottie_file('animations_and_audios/robot.json')
@@ -212,11 +213,11 @@ def introduction():
     with left_column:
         st.subheader("Introduction")
         intro_text = ('''
-                    - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, predictive analysis, automated data report generation, and AI-powered dataset chatbot.
+                    - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, AI powered recommendations, automated data report generation and AI-powered dataset chatbot.
                     - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
                     - The tool is built using Python, Streamlit, and Gemini API for AI-powered content generation.
                     - It offers a wide range of features to help users explore, analyze, and gain insights from their data.
-                    - The tool is equipped with AI models that can generate data visualizations, predictive analysis models, and automated data report generation based on user input.
+                    - The tool is equipped with AI models that can generate data visualizations, recommendation models, and automated data report generation based on user input.
                 ''')
         st.markdown(intro_text)
 
@@ -230,9 +231,10 @@ def introduction():
         feature_text = ('''
                     - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
                     - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
-                    - **PredictEase:** A feature for predictive analysis. Where you can predict the target variable using different algorithms.
+                    - **FutureCast AI:** A feature for AI-based recommendations. Where you can get present and future insights based on the dataset.
                     - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
-                    - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.''')
+                    - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.
+                    - **VisionFusion:** A feature for AI-powered image analysis. Where you can analyze the images using AI models.''')
         st.markdown(feature_text)
     
     with left_column:
@@ -247,11 +249,11 @@ def introduction():
             - **Python:** Core programming language used for data processing, machine learning, and backend logic.
             - **Streamlit:** Framework used to build the interactive web application and user interface.
             - **Pandas:** Library for efficient data manipulation, cleaning, and analysis.
-            - **Scikit-learn:** Machine learning library used for model building, classification, and regression tasks.
             - **Matplotlib/Seaborn:** Libraries for generating data visualizations and plots.
-            - **Gemini API:** Used for automating code generation for visualizations and data handling.
+            - **Gemini:** Google LLM Model used for AI-powered content generation.
             - **Streamlit-Authenticator:** For handling user authentication, login, and registration.
-            - **.env:** For securely storing environment variables like API keys and sensitive data.''')
+            - **.env:** For securely storing environment variables like API keys and sensitive data.
+            - **gTTS:** Google Text-to-Speech library for generating audio files from text.''')
     with right_column:
         tech_used = load_lottie_file('animations_and_audios/tech_used.json')
         st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
@@ -265,7 +267,7 @@ def introduction():
             st.audio('animations_and_audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
     st.divider()
 
-#----------------------------- Page 1: Statistical Analysis -----------------------------#
+###################################################### Page 2: Statistical Analysis ######################################################
 def statistical_analysis():
     st.header('🧹CleanStats: Cleaning & Statistical Analysis', divider='rainbow')
     # Upload dataset
@@ -317,7 +319,7 @@ def statistical_analysis():
             col2.write("Numerical columns unique values:")
             col2.write(df.select_dtypes(include=[np.number]).nunique())
 
-#----------------------------- Page 2: Data Visualization -----------------------------#
+###################################################### Page 3: Data Visualization ######################################################
 def data_visualization():
     st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
     # Upload dataset
@@ -377,7 +379,7 @@ def data_visualization():
                     except Exception as e:
                         st.error(e)
 
-#----------------------------- Page 3: AI Based Recommendations -----------------------------#
+###################################################### Page 4: AI Based Recommendations ######################################################
 def ai_recommendation():
     st.header('🔮FutureCast AI: AI Recommendation Based On Dataset', divider='rainbow')
     # Upload dataset
@@ -413,7 +415,7 @@ def ai_recommendation():
                 st.write(response.text)
                 st.success("Recommendation generated successfully!")
 
-#----------------------------- Page 4: Analysis Report -----------------------------#
+###################################################### Page 5: Analysis Report ######################################################
 def analysis_report():
     st.header('📑InsightGen: Automated Data Report Generator', divider='rainbow')
     # Upload dataset
@@ -443,7 +445,7 @@ def analysis_report():
                 mime="text/html"
             )
 
-#----------------------------- Page 5: AI Recommendations -----------------------------#
+###################################################### Page 6: Dataset ChatBot ######################################################
 def ai_data_file_chatbot():
     st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
     # Upload dataset
@@ -476,7 +478,28 @@ def ai_data_file_chatbot():
                 response = chat_session.send_message(question)
                 st.write(response.text)
 
-#----------------------------- About Us -----------------------------#
+###################################################### Page 7: Vision Analysis ######################################################
+def vision_analysis():
+    st.header('👁️VisionFusion: AI-Powered Image Analysis ', divider='rainbow')
+    # Upload image
+    st.write('Upload an image to analyze:')
+    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    if uploaded_image is not None:
+        st.success("Image uploaded successfully!")
+        user_query = st.text_input("Ask a query:")
+        if st.button("Submit"):
+            with st.spinner("Processing..."):
+                file_name = uploaded_image.name
+                st.subheader(f"'{file_name}' Image Analysis:")
+                st.divider()
+                image = Image.open(uploaded_image)
+                prompt = f"Analyze the image and provide a detailed description of the image. {user_query}"
+                response = model.generate_content([prompt,image], stream=True)
+                response.resolve()
+                st.write(response.text)
+                st.success("Image analyzed successfully!")
+
+###################################################### Page 8: About Us ######################################################
 def about_us():
     st.header('👨‍💻About Us: Meet Team Aurora', divider='rainbow')
     left_column, right_column = st.columns(2)
@@ -574,7 +597,7 @@ def about_us():
     """, unsafe_allow_html=True
 )
 
-#----------------------------- Navigation -----------------------------#
+###################################################### Navigation ######################################################
 if st.session_state["authentication_status"]:
     pg = st.navigation([
         st.Page(introduction, title='Home', icon='🏠'),
@@ -583,6 +606,7 @@ if st.session_state["authentication_status"]:
         st.Page(ai_recommendation, title='FutureCast AI', icon='🔮'),
         st.Page(analysis_report, title='InsightGen', icon='📑'),
         st.Page(ai_data_file_chatbot, title='SmartQuery', icon='🤖'),
+        st.Page(vision_analysis, title='VisionFusion', icon='👁️'),
         st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
     pg.run()
