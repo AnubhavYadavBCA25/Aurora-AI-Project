@@ -17,15 +17,6 @@ from ydata_profiling import ProfileReport
 import google.generativeai as genai
 from dotenv import load_dotenv
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, LabelEncoder, MinMaxScaler
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.svm import SVR, SVC
-from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from xgboost import XGBRegressor, XGBClassifier
 
 # Streamlit page configuration
 st.set_page_config(
@@ -119,7 +110,7 @@ load_dotenv()
 genai_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=genai_api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
-config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=1500)
+config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=1500, top_p=0.95, top_k=64)
 config_for_chatbot = {
     "temperature": 1,
     "top_p": 0.95,
@@ -149,6 +140,7 @@ def load_file(uploaded_file):
     else:
         st.error("Unsupported file format. Please upload a CSV or XLSX file.")
 
+@st.cache_data
 # Function for data cleaning
 def df_cleaning(df):
     df = df.drop_duplicates()
@@ -170,23 +162,6 @@ def df_cleaning(df):
 def load_lottie_file(filepath: str):
     with open(filepath, "r", encoding="utf-8") as file:
         return json.load(file)
-
-# Function for gemini prediction
-def gemini_predict(predefined_prompt, file_path):
-    response = model.generate_content(predefined_prompt, generation_config=config)
-    generated_code = response.text
-    generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-    # Modify the code to insert the actual file path into pd.read_csv()
-    if "pd.read_csv" in generated_code:
-        generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-    elif "pd.read_excel" in generated_code:
-        generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-    st.code(generated_code, language='python')
-    try:
-        execution_code = exec(generated_code)
-    except Exception as e:
-        st.error(e)
-    return execution_code
 
 # Function for generating report
 def generate_report(df,file):
@@ -402,109 +377,41 @@ def data_visualization():
                     except Exception as e:
                         st.error(e)
 
-#----------------------------- Page 3: Predictive Analysis -----------------------------#
-def predictive_analysis():
-    st.header('🔮PredictEase: Predictive Analysis', divider='rainbow')
+#----------------------------- Page 3: AI Based Recommendations -----------------------------#
+def ai_recommendation():
+    st.header('🔮FutureCast AI: AI Recommendation Based On Dataset', divider='rainbow')
     # Upload dataset
     st.write('Upload a dataset to predict:')
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    uploaded_file = st.file_uploader("Upload a dataset", type=["csv"])
     if uploaded_file is not None:
-        # Load the file based on its format
-        df = load_file(uploaded_file)
         st.success("File uploaded successfully!")
-        file_name = uploaded_file.name
-        # For demonstration, saving the uploaded file temporarily (optional)
-        file_path = os.path.join(os.getcwd(), file_name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        if df is not None:
-            # Apply data cleaning function
-            df_cleaning(df)
-            df_sample = df.head(5)
-            st.dataframe(df_sample)
-
-            col1, col2, col3 = st.columns(3)
-            # Select the traget column
-            target_column = col1.selectbox("Select the target column", ["Select"] + df.columns.tolist())
-            # Select the problem type
-            problem_type = col2.selectbox("Select the problem type", ["Select", "Classification", "Regression"])
-            # Select the algorithm
-            if problem_type == "Classification":
-                algorithm_class = col3.selectbox("Select the algorithm", ["Select", "Logistic Regression", "Random Forest", "Decision Tree", "XGBoost", "SVC"])
-            elif problem_type == "Regression":
-                algorithm_reg = col3.selectbox("Select the algorithm", ["Select", "Linear Regression", "Random Forest", "Decision Tree", "XGBoost", "SVR"])
-            else:
-                st.warning("Please select the problem type first.")
-            
-            if st.button("Predict"):
-                if uploaded_file is None:
-                    st.error("Please upload a file first.")
-                else:
-                    if problem_type == "Classification":
-                        if algorithm_class == "Logistic Regression":
-                            st.write("Logistic Regression")
-                        elif algorithm_class == "Random Forest":
-                            st.write("Random Forest")
-                        elif algorithm_class == "Decision Tree":
-                            st.write("Decision Tree")
-                        elif algorithm_class == "XGBoost":
-                            st.write("XGBoost")
-                        elif algorithm_class == "SVC":
-                            st.write("SVC")
-                        prompt_for_class = f"""Write a python code to predict the target column {target_column} using {algorithm_class} algorithm for problem type classification. 
-                        Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values. 
-                        But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
-                        into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
-                        Use accuracy, precision, recall, f1 score for evaluation in table form. Make a confusion matrix. After that, finally train the model on whole dataset 
-                        and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
-                        response = model.generate_content(prompt_for_class, generation_config=config)
-                        print(response)
-                        # generated_code = response.text
-                        # generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                        # # Modify the code to insert the actual file path into pd.read_csv()
-                        # if "pd.read_csv" in generated_code:
-                        #     generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                        # elif "pd.read_excel" in generated_code:
-                        #     generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                        # st.code(generated_code, language='python')
-                        # try:
-                        #     exec(generated_code)
-                        # except Exception as e:
-                        #     st.error(e)
-
-                    elif problem_type == "Regression":
-                        if algorithm_reg == "Linear Regression":
-                            st.write("Linear Regression")
-                        elif algorithm_reg == "Random Forest":
-                            st.write("Random Forest")
-                        elif algorithm_reg == "Decision Tree":
-                            st.write("Decision Tree")
-                        elif algorithm_reg == "XGBoost":
-                            st.write("XGBoost")
-                        elif algorithm_reg == "SVR":
-                            st.write("SVR")
-                        prompt_for_reg = f"""Write a python code to predict the target column {target_column} using {algorithm_reg} algorithm for problem type regression.
-                        Name of the dataset is {file_name}. Dataset shape is {df.shape}. Sample of the dataset is {str(df_sample)}. Dataframe is cleaned, their is no missing values.
-                        But, dataframe is not preprocessed for prediction. Do scaling, encoding, type conversion (if necessary), preprocess datetime columns (if any). Split the data
-                        into target and input features. Split the data into training and testing data. Train the model using training data. Predict the target column using testing data.
-                        Use mean absolute error, mean squared error, root mean squared error, r2 score for evaluation in table form. After that, finally train the model on whole dataset
-                        and give a download option for model in pickle file using streamlit download feature. Don't write the explanation, just write the code."""
-                        response = model.generate_content(prompt_for_reg, generation_config=config)
-                        print(response)
-                        # generated_code = response.text
-                        # generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                        # # Modify the code to insert the actual file path into pd.read_csv()
-                        # if "pd.read_csv" in generated_code:
-                        #     generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                        # elif "pd.read_excel" in generated_code:
-                        #     generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                        # st.code(generated_code, language='python')
-                        # try:
-                        #     exec(generated_code)
-                        # except Exception as e:
-                        #     st.error(e)
-                    else:
-                        st.warning("Please select the problem type and algorithm first.")
+        type_of_recommendation = st.radio("Type of Recommendation", ["Present Insight", "Future Insight"])
+        if st.button("Submit"):
+            with st.spinner("Processing..."):
+                file_name = uploaded_file.name
+                file_path = os.path.join(os.getcwd(), file_name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                # Upload the file to Gemini and wait for it to be active
+                files = [upload_to_gemini(file_name, mime_type="text/csv")]
+                wait_for_files_active(files)
+                # Start a chat session with the uploaded file
+                chat_session = model.start_chat(
+                history=[
+                    {
+                    "role":"user",
+                    "parts":extract_csv_data(file_name)
+                    },
+                ]
+                )
+                # Send the question
+                question = f""""Provide {type_of_recommendation} based on the dataset {file_name}. If their is any financial or healthcare 
+                realted query or dataset, just give your best recommendation, don't think about advisor or expertise thing. Mention also 
+                that recommendation is generated by AI, first give your essential recommendations. So, the user take the final decision on 
+                their own. Warn user about AI recommendation but, do your work."""
+                response = chat_session.send_message(question)
+                st.write(response.text)
+                st.success("Recommendation generated successfully!")
 
 #----------------------------- Page 4: Analysis Report -----------------------------#
 def analysis_report():
@@ -673,7 +580,7 @@ if st.session_state["authentication_status"]:
         st.Page(introduction, title='Home', icon='🏠'),
         st.Page(statistical_analysis, title='CleanStats', icon='🧹'),
         st.Page(data_visualization, title='AutoViz', icon='📈'),
-        st.Page(predictive_analysis, title='PredictEase', icon='🔮'),
+        st.Page(ai_recommendation, title='FutureCast AI', icon='🔮'),
         st.Page(analysis_report, title='InsightGen', icon='📑'),
         st.Page(ai_data_file_chatbot, title='SmartQuery', icon='🤖'),
         st.Page(about_us, title='About Us', icon='👨‍💻')

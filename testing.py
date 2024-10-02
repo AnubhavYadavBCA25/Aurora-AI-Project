@@ -11,6 +11,11 @@ from PyPDF2 import PdfReader
 import pyttsx3
 from gtts import gTTS
 import threading
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.metrics import accuracy_score, mean_squared_error, r2_score, confusion_matrix, precision_score, recall_score, f1_score, mean_absolute_error
 
 load_dotenv()
 
@@ -19,8 +24,8 @@ genai.configure(api_key=api_key)
 
 
 st.title('Aurora Testing')
-model = genai.GenerativeModel('gemini-pro')
-config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=1000)
+model = genai.GenerativeModel('gemini-1.5-flash')
+config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
 # prompt = 'Write a code in python to plot a barplot'
 # response = model.generate_content(prompt, generation_config=config)
 # st.write(response.text)
@@ -180,67 +185,36 @@ model = genai.GenerativeModel(
 #           audio_bytes = audio.read()
 #           st.audio(audio_bytes, format="audio/mp3", autoplay=True, start_time=0)
 
-# Testing About Us Page
-# Define Font Awesome icons with hyperlinks
-def social_icons(email, linkedin, github):
-    return f"""
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <p>
-        <a href="mailto:{email}" target="_blank">
-            <img src="https://img.icons8.com/ios-glyphs/30/000000/email.png" alt="Email Icon" style="margin-right: 10px;">
-        </a>
-        
-        <a href="{linkedin}" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
-        
-        <a href="{github}" target="_blank">
-            <img src="https://img.icons8.com/ios-glyphs/30/000000/github.png" alt="GitHub Icon" style="margin-right: 10px;">
-        </a>
-    </p>
-    """
-
-# Define a function to display team member details
-def display_member(role, email, linkedin, github, bio):
-    st.markdown(f"""
-    - **Role:** {role}
-    - **Email:** {email}
-    - **LinkedIn:** {linkedin}
-    - **GitHub:** {github}
-    - **Bio:** {bio}
-    """, unsafe_allow_html=True)
-    
-    # Display the social icons
-    st.markdown(social_icons(email, linkedin, github), unsafe_allow_html=True)
-
-# Example team member data
-members = [
-    {
-        "name": "Anubhav Yadav",
-        "role": "Project Lead",
-        "email": "anubhav@example.com",
-        "linkedin": "https://www.linkedin.com/in/anubhav-yadav/",
-        "github": "https://github.com/anubhav-yadav",
-        "bio": "Anubhav is a passionate data scientist leading the Aurora project."
-    },
-    {
-        "name": "John Doe",
-        "role": "Data Analyst",
-        "email": "john@example.com",
-        "linkedin": "https://www.linkedin.com/in/johndoe/",
-        "github": "https://github.com/johndoe",
-        "bio": "John is a data enthusiast specializing in predictive modeling."
-    }
-]
-
-# About Us Section
-st.title("About Us")
-
-# Loop through each member and display their info
-for member in members:
-    display_member(member['role'], member['email'], member['linkedin'], member['github'], member['bio'])
-    st.markdown("---")
-
-st.markdown('''
-<a href="https://www.linkedin.com/in/yourlinkedin/" target="_blank">
-    <img src="https://img.icons8.com/color/75/linkedin.png" alt="LinkedIn Icon" style="margin-right: 10px;">
-</a>
-''', unsafe_allow_html=True)
+# Testing recommendation feature
+st.header('🔮FutureCast AI: AI Recommendation Based On Dataset', divider='rainbow')
+    # Upload dataset
+st.write('Upload a dataset to predict:')
+uploaded_file = st.file_uploader("Upload a dataset", type=["csv"])
+if uploaded_file is not None:
+        st.success("File uploaded successfully!")
+        type_of_recommendation = st.radio("Type of Recommendation", ["Present Insight", "Future Insight"])
+        if st.button("Submit"):
+            with st.spinner("Processing..."):
+                file_name = uploaded_file.name
+                file_path = os.path.join(os.getcwd(), file_name)
+                with open(file_path, "wb") as f:
+                    f.write(uploaded_file.getbuffer())
+                # Upload the file to Gemini and wait for it to be active
+                files = [upload_to_gemini(file_name, mime_type="text/csv")]
+                wait_for_files_active(files)
+                # Start a chat session with the uploaded file
+                chat_session = model.start_chat(
+                history=[
+                    {
+                    "role":"user",
+                    "parts":extract_csv_data(file_name)
+                    },
+                ]
+                )
+                # Send the question
+                question = f"""Provide {type_of_recommendation} based on the dataset {file_name}.
+                If their is any financial or healthcare realted query or dataset, just give your best recommendation, don't think about advisor or expertise 
+                thing. Mention also that recommendation is generated by AI, first give your essential recommendations. So, the user take the final decision on their own. Warn user about AI recommendation but, do your work."""
+                response = chat_session.send_message(question)
+                st.write(response.text)
+                st.success("Recommendation generated successfully!")
