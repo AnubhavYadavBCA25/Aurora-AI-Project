@@ -13,13 +13,13 @@ from gtts import gTTS
 from PIL import Image
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=api_key)
+# api_key = os.getenv("GEMINI_API_KEY")
+# genai.configure(api_key=api_key)
 
 
 st.title('Aurora Testing')
-model = genai.GenerativeModel('gemini-1.5-flash')
-config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
+# model = genai.GenerativeModel('gemini-1.5-flash')
+# config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
 # prompt = 'Write a code in python to plot a barplot'
 # response = model.generate_content(prompt, generation_config=config)
 # st.write(response.text)
@@ -215,6 +215,14 @@ model = genai.GenerativeModel(
 
 # Testing vision feature
 st.header('👁️ Vision AI: AI Vision Feature Test', divider='rainbow')
+with st.sidebar:
+   genai_api_key = st.text_input("Enter your Gemini API Key:", type="password", key="api_key")
+if genai_api_key is None:
+    st.error("Please enter your Gemini API Key.")
+    st.stop()
+genai.configure(api_key=genai_api_key)
+model = genai.GenerativeModel('gemini-1.5-flash')
+config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
 # Upload image
 st.write('Upload an image to analyze:')
 uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])

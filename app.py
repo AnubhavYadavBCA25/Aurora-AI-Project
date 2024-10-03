@@ -441,15 +441,17 @@ def analysis_report():
                     st.write(generated_report)
                     st.success("Report generated successfully!")
 
-            # Generate a report in HTML format for download
-            report_path = generate_report(df, uploaded_file)
-            with open(report_path, 'rb') as f:
-                st.download_button(
-                    label="Download Report",
-                    data=f,
-                    file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
-                    mime="text/html"
-                )
+            st.write("Wait for the report to be generated...")
+            with st.spinner("Generating Report..."):
+                # Generate a report in HTML format for download
+                report_path = generate_report(df, uploaded_file)
+                with open(report_path, 'rb') as f:
+                    st.download_button(
+                        label="Download Report",
+                        data=f,
+                        file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
+                        mime="text/html"
+                    )
 
 ###################################################### Page 6: Dataset ChatBot ######################################################
 def ai_data_file_chatbot():
@@ -492,6 +494,8 @@ def vision_analysis():
     st.write('Upload an image to analyze:')
     uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
     if uploaded_image is not None:
+        # Show uploaded image
+        st.image(uploaded_image, caption="Uploaded Image", use_column_width=False)
         st.success("Image uploaded successfully!")
         user_query = st.text_input("Ask a query:")
         if st.button("Submit"):
