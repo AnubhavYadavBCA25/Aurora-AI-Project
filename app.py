@@ -357,27 +357,30 @@ def data_visualization():
 
             # Call the AI model to generate the visualization code and display the visualization
             if st.button("Visualize"):
-                if uploaded_file is None:
-                    st.error("Please upload a file first.")
-                else:
-                    predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
-                    Plot for the dataset columns {prompt}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
-                    Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
-                    response = model.generate_content(predefined_prompt, generation_config=config)
-                    generated_code = response.text
-                    generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                    
-                    # Modify the code to insert the actual file path into pd.read_csv()
-                    if "pd.read_csv" in generated_code:
-                        generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                    elif "pd.read_excel" in generated_code:
-                        generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                    st.code(generated_code, language='python')
-                    try:
-                        exec(generated_code)
-                        st.pyplot(plt.gcf())
-                    except Exception as e:
-                        st.error(e)
+                with st.spinner("Processing..."):
+                    st.subheader(f"{visualization_type} Visualization:")
+                    if uploaded_file is None:
+                        st.error("Please upload a file first.")
+                    else:
+                        predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
+                        Plot for the dataset columns {prompt}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
+                        Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
+                        response = model.generate_content(predefined_prompt, generation_config=config)
+                        generated_code = response.text
+                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+                        
+                        # Modify the code to insert the actual file path into pd.read_csv()
+                        if "pd.read_csv" in generated_code:
+                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+                        elif "pd.read_excel" in generated_code:
+                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+                        st.code(generated_code, language='python')
+                        try:
+                            exec(generated_code)
+                            st.pyplot(plt.gcf())
+                        except Exception as e:
+                            st.error(e)
+                        st.success("Visualization generated successfully!")
 
 ###################################################### Page 4: AI Based Recommendations ######################################################
 def ai_recommendation():
@@ -391,6 +394,7 @@ def ai_recommendation():
         if st.button("Submit"):
             with st.spinner("Processing..."):
                 file_name = uploaded_file.name
+                st.subheader("Recommendation:")
                 file_path = os.path.join(os.getcwd(), file_name)
                 with open(file_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
@@ -422,28 +426,30 @@ def analysis_report():
     st.write('Upload a dataset to generate a report:')
     uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
     if uploaded_file is not None:
-        filename = uploaded_file.name
-        df = load_file(uploaded_file)
-        st.success("File uploaded successfully!")
-        if df is not None:
-            # Gemini Text Report Generation
-            summary = df.describe().transpose().to_string()
-            prompt = f"""Generate a text report for {filename} dataset using Gemini AI. Here's the summary of the dataset: {summary}.
-                    Try to make the report in bullet points and use numbers for better readability and understanding."""
-            response = model.generate_content(prompt, generation_config=config)
-            generated_report = response.text
-            st.write(generated_report)
-            st.success("Report generated successfully!")
+        if st.button("Submit"):
+            with st.spinner("Processing..."):
+                filename = uploaded_file.name
+                df = load_file(uploaded_file)
+                st.success("File uploaded successfully!")
+                if df is not None:
+                    # Gemini Text Report Generation
+                    summary = df.describe().transpose().to_string()
+                    prompt = f"""Generate a text report for {filename} dataset using Gemini AI. Here's the summary of the dataset: {summary}.
+                            Try to make the report in bullet points and use numbers for better readability and understanding."""
+                    response = model.generate_content(prompt, generation_config=config)
+                    generated_report = response.text
+                    st.write(generated_report)
+                    st.success("Report generated successfully!")
 
-        # Generate a report in HTML format for download
-        report_path = generate_report(df, uploaded_file)
-        with open(report_path, 'rb') as f:
-            st.download_button(
-                label="Download Report",
-                data=f,
-                file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
-                mime="text/html"
-            )
+            # Generate a report in HTML format for download
+            report_path = generate_report(df, uploaded_file)
+            with open(report_path, 'rb') as f:
+                st.download_button(
+                    label="Download Report",
+                    data=f,
+                    file_name=f"{uploaded_file.name.split('.')[0]}_report.html",
+                    mime="text/html"
+                )
 
 ###################################################### Page 6: Dataset ChatBot ######################################################
 def ai_data_file_chatbot():
@@ -456,8 +462,9 @@ def ai_data_file_chatbot():
         # Get the user question
         question = st.text_input("Ask a question:", key="question")
         if st.button("Submit"):
-            with st.spinner("Generating response..."):
+            with st.spinner("Processing..."):
                 file_name = uploaded_file.name
+                st.subheader("ChatBot Response:")
                 file_path = os.path.join(os.getcwd(), file_name)
                 with open(file_path, "wb") as f:
                     f.write(uploaded_file.getbuffer())
@@ -580,7 +587,7 @@ def about_us():
                     - **GitHub:** [![Satyam Kumar GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/satyamkr21)
                     - **Bio:** Satyam Kumar, an AI developer and ML enthusiast, pursuing BCA in Data Science, blends AI with intuitive 
                         web design to create seamless user experiences, driven by innovation and a passion for impactful solutions.
-                        He is skilled in mantaining the content and design of the website.
+                        He is skilled in maintaining the content and design of the website.
                     ''')
     with right_column:
         satyam_profile = load_lottie_file('profile_animations/satyam_profile.json')
