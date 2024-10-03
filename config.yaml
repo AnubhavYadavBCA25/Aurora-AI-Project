@@ -26,6 +26,10 @@ credentials:
       logged_in: false
       name: Eshaan Sabharwal
       password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
+    shobhit:
+      email: shobhitadhya@gmail.com
+      name: Shobhit Kumar
+      password: $2b$12$de22mDX4vQMnJO7xVN7e.u9XM4kiOOzdKPWmb5HHTg0maa.tvEDZS
     sparshjaiswal:
       email: sparsh@gmail.com
       failed_login_attempts: 0
