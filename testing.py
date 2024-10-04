@@ -228,8 +228,13 @@ st.write('Upload an image to analyze:')
 uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 if uploaded_image is not None:
     st.success("Image uploaded successfully!")
+    st.image(uploaded_image, caption="Uploaded Image", use_column_width=False)
     user_query = st.text_input("Ask a query:")
     if st.button("Submit"):
+      if genai_api_key is None:
+        st.error("Please enter a query.")
+        st.stop()
+      else:
         with st.spinner("Processing..."):
             file_name = uploaded_image.name
             st.subheader(f"'{file_name}' Image Analysis:")

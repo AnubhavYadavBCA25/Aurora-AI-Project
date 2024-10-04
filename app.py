@@ -258,13 +258,57 @@ def introduction():
                     - **Step 1:** Go to [Gemini API](https://aistudio.google.com/app/apikey) and sign up for an account.
                     - **Step 2:** After signing up, click on "Create API Key".
                     - **Step 3:** Select exsisting project or create a "New Project" on [Google Cloud Platform](https://console.cloud.google.com/).
-                    - **Step 4:** After selecting the project, click on "Create API Key" to generate the API Key.
+                    - **Step 4:** After selecting the project, click on "Create API key in existing  project" to generate the API Key.
                     - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
                     - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
                     ''')
     with right_column:
         gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
         st_lottie.st_lottie(gemini_logo, key='logo', height=350, width=350 ,loop=True)
+    st.divider()
+
+    # FAQ's Section
+    st.subheader("FAQs:", divider='rainbow')
+    # FAQ 1
+    with st.expander("What kind of datasets can I upload?"):
+        st.markdown("""
+        **Ans:** You can upload datasets in CSV or XLSX format. Ensure the dataset has well-defined headers for better analysis.
+        Datasets should not contain missing or invalid data.
+        """)
+
+    # FAQ 2
+    with st.expander("How do I get a Gemini API key?"):
+        st.markdown("""
+        **Ans:** To get a Gemini API key:
+        1. Sign up for a Gemini account on the official website.
+        2. Navigate to the API section in your profile.
+        3. Generate an API key and copy it for use in the app.
+        """)
+
+    # FAQ 3
+    with st.expander("What statistical methods are available?"):
+        st.markdown("""
+        **Ans:** We currently support:
+        - Descriptive statistics (mean, median, mode, etc.)
+        - Hypothesis testing
+        - Correlation analysis
+        - And more to come soon!
+        """)
+
+    # FAQ 4
+    with st.expander("How do I troubleshoot errors in data upload?"):
+        st.markdown("""
+        **Ans:** If you encounter errors during data upload, ensure that:
+        - Your file format is CSV or XLSX.
+        - The file is not corrupted or empty.
+        - All required columns are present in the dataset.
+        """)
+
+    # FAQ 5
+    with st.expander("Can I download the analysis report?"):
+        st.markdown("""
+        **Ans:** Yes, after generating the analysis, you will have the option to download the report as a PDF or HTML file for future reference.
+        """)
 
     with st.sidebar:
         if st.button("Introduce"):
