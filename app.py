@@ -110,7 +110,7 @@ else:
 load_dotenv()
 # Authenticate with Gemini API
 with st.sidebar:
-    genai_api_key = st.text_input("Enter your Gemini API Key:", type="password", key='api_key')
+    genai_api_key = st.text_input("Enter your Gemini API Key:", type="password", placeholder="Enter API Key" ,key='api_key')
 if genai_api_key is None:
     st.error("Please enter your Gemini API Key.")
     st.stop()
@@ -216,7 +216,7 @@ def generate_tts(text, file_name):
 
 ###################################################### Page 1: Introduction Page ######################################################
 def introduction():
-    st.header('🤖Aurora AI: AI Powered Data Analytics Tool', divider='rainbow')
+    st.header('🤖Aurora: AI Powered Automated Data Analytics Tool', divider='rainbow')
     robot_file = load_lottie_file('animations_and_audios/robot.json')
     left_column, right_column = st.columns(2)
     with left_column:
@@ -262,6 +262,7 @@ def introduction():
                     - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
                     - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
                     ''')
+        st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
     with right_column:
         gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
         st_lottie.st_lottie(gemini_logo, key='logo', height=350, width=350 ,loop=True)
@@ -273,7 +274,7 @@ def introduction():
     with st.expander("What kind of datasets can I upload?"):
         st.markdown("""
         **Ans:** You can upload datasets in CSV or XLSX format. Ensure the dataset has well-defined headers for better analysis.
-        Datasets should not contain missing or invalid data.
+        Datasets should not contain invalid data.
         """)
 
     # FAQ 2
@@ -290,7 +291,7 @@ def introduction():
         st.markdown("""
         **Ans:** We currently support:
         - Descriptive statistics (mean, median, mode, etc.)
-        - Hypothesis testing
+        - Skewness and Kurtosis
         - Correlation analysis
         - And more to come soon!
         """)
