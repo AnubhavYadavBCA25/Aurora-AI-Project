@@ -108,9 +108,18 @@ else:
 ###################################################### AI Models ######################################################
 # Gemini API
 load_dotenv()
-genai_api_key = os.getenv("GEMINI_API_KEY")
+# Authenticate with Gemini API
+with st.sidebar:
+    genai_api_key = st.text_input("Enter your Gemini API Key:", type="password", key='api_key')
+if genai_api_key is None:
+    st.error("Please enter your Gemini API Key.")
+    st.stop()
 genai.configure(api_key=genai_api_key)
+
+# Load the generative model
 model = genai.GenerativeModel('gemini-1.5-flash')
+
+# Generation config for the chatbot
 config = genai.types.GenerationConfig(temperature=1.0, max_output_tokens=1500, top_p=0.95, top_k=64)
 config_for_chatbot = {
     "temperature": 1,
@@ -211,7 +220,7 @@ def introduction():
     robot_file = load_lottie_file('animations_and_audios/robot.json')
     left_column, right_column = st.columns(2)
     with left_column:
-        st.subheader("Introduction")
+        st.subheader("Introduction", divider='rainbow')
         intro_text = ('''
                     - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, AI powered recommendations, automated data report generation and AI-powered dataset chatbot.
                     - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
@@ -227,7 +236,7 @@ def introduction():
 
     left_column, right_column = st.columns(2)
     with right_column:
-        st.subheader("Features:")
+        st.subheader("Features:", divider='rainbow')
         feature_text = ('''
                     - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
                     - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
@@ -244,19 +253,18 @@ def introduction():
 
     left_column, right_column = st.columns(2)
     with left_column:
-        st.subheader('Technology Stack:')
+        st.subheader('How To Get Gemini API Key?', divider='rainbow')
         st.markdown('''
-            - **Python:** Core programming language used for data processing, machine learning, and backend logic.
-            - **Streamlit:** Framework used to build the interactive web application and user interface.
-            - **Pandas:** Library for efficient data manipulation, cleaning, and analysis.
-            - **Matplotlib/Seaborn:** Libraries for generating data visualizations and plots.
-            - **Gemini:** Google LLM Model used for AI-powered content generation.
-            - **Streamlit-Authenticator:** For handling user authentication, login, and registration.
-            - **.env:** For securely storing environment variables like API keys and sensitive data.
-            - **gTTS:** Google Text-to-Speech library for generating audio files from text.''')
+                    - **Step 1:** Go to [Gemini API](https://aistudio.google.com/app/apikey) and sign up for an account.
+                    - **Step 2:** After signing up, click on "Create API Key".
+                    - **Step 3:** Select exsisting project or create a "New Project" on [Google Cloud Platform](https://console.cloud.google.com/).
+                    - **Step 4:** After selecting the project, click on "Create API Key" to generate the API Key.
+                    - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
+                    - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
+                    ''')
     with right_column:
-        tech_used = load_lottie_file('animations_and_audios/tech_used.json')
-        st_lottie.st_lottie(tech_used, key='tech', height=500, width=500 ,loop=True)
+        gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
+        st_lottie.st_lottie(gemini_logo, key='logo', height=350, width=350 ,loop=True)
 
     with st.sidebar:
         if st.button("Introduce"):
