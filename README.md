@@ -140,14 +140,15 @@ This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md)
 
 - **Anubhav Yadav** - Lead Developer
   - [LinkedIn](https://www.linkedin.com/in/anubhav-yadav-data-science/)
-- **Sparsh Jaiswal** - Developer
-  - [LinkedIn](https://www.linkedin.com/in/sparsh-jaiswal-aa903730b/)
 - **Eshaan Sabharwal** - Developer
   - [LinkedIn](https://www.linkedin.com/in/eshaan-sabharwal-b73a201b2)
 - **Drishti Jaiswal** - Developer
   - [LinkedIn](http://linkedin.com/in/drishti-jaiswal-40331627b)
 - **Satyam Kumar** - Developer
   - [LinkedIn](https://www.linkedin.com/in/satyam-kumar-63419a251/)
+ **Sparsh Jaiswal** - Developer
+  - [LinkedIn](https://www.linkedin.com/in/sparsh-jaiswal-aa903730b/)
+
 
 ## Acknowledgments
 
