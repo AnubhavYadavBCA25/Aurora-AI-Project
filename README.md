@@ -85,7 +85,7 @@ Aurora AI is not just a tool; it's a comprehensive solution for modern data chal
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-repo/aurora-ai.git
+   git clone https://github.com/AnubhavYadavBCA25/Aurora-IA-Project.git
    ```
 
 2. Navigate to the project directory:
@@ -149,11 +149,11 @@ This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md)
 - **Satyam Kumar** - Developer
   - [LinkedIn](https://www.linkedin.com/in/satyam-kumar-63419a251/)
 
-
 ## Acknowledgments
 
 - Thanks to Anthropic for providing the Gemini API
 - Special thanks to all users and supporters of Aurora AI
 
 For any questions or support, please contact the development team or open an issue on the GitHub repository.
+
 
