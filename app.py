@@ -255,7 +255,7 @@ def introduction():
     with left_column:
         st.subheader('How To Get Gemini API Key?', divider='rainbow')
         st.markdown('''
-                    - **Step 1:** Go to [Gemini API](https://aistudio.google.com/app/apikey) and sign up for an account.
+                    - **Step 1:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and sign up for an account.
                     - **Step 2:** After signing up, click on "Create API Key".
                     - **Step 3:** Select exsisting project or create a "New Project" on [Google Cloud Platform](https://console.cloud.google.com/).
                     - **Step 4:** After selecting the project, click on "Create API key in existing  project" to generate the API Key.
@@ -268,48 +268,53 @@ def introduction():
         st_lottie.st_lottie(gemini_logo, key='logo', height=350, width=350 ,loop=True)
     st.divider()
 
+    # Demo Video
+    # st.subheader("Demo Video:", divider='rainbow')
+    # pass
+    # st.divider()
     # FAQ's Section
-    st.subheader("FAQs:", divider='rainbow')
-    # FAQ 1
-    with st.expander("What kind of datasets can I upload?"):
-        st.markdown("""
-        **Ans:** You can upload datasets in CSV or XLSX format. Ensure the dataset has well-defined headers for better analysis.
-        Datasets should not contain invalid data.
-        """)
+    with st.container(border=True):
+        st.subheader("FAQs:", divider='rainbow')
+        # FAQ 1
+        with st.expander("What kind of datasets can I upload?"):
+            st.markdown("""
+            **Ans:** You can upload datasets in CSV or XLSX format. Ensure the dataset has well-defined headers for better analysis.
+            Datasets should not contain invalid data.
+            """)
 
-    # FAQ 2
-    with st.expander("How do I get a Gemini API key?"):
-        st.markdown("""
-        **Ans:** To get a Gemini API key:
-        1. Sign up for a Gemini account on the official website.
-        2. Navigate to the API section in your profile.
-        3. Generate an API key and copy it for use in the app.
-        """)
+        # FAQ 2
+        with st.expander("How do I get a Gemini API key?"):
+            st.markdown("""
+            **Ans:** To get a Gemini API key:
+            1. Sign up for a Gemini account on the official website.
+            2. Navigate to the API section in your profile.
+            3. Generate an API key and copy it for use in the app.
+            """)
 
-    # FAQ 3
-    with st.expander("What statistical methods are available?"):
-        st.markdown("""
-        **Ans:** We currently support:
-        - Descriptive statistics (mean, median, mode, etc.)
-        - Skewness and Kurtosis
-        - Correlation analysis
-        - And more to come soon!
-        """)
+        # FAQ 3
+        with st.expander("What statistical methods are available?"):
+            st.markdown("""
+            **Ans:** We currently support:
+            - Descriptive statistics (mean, median, mode, etc.)
+            - Skewness and Kurtosis
+            - Correlation analysis
+            - And more to come soon!
+            """)
 
-    # FAQ 4
-    with st.expander("How do I troubleshoot errors in data upload?"):
-        st.markdown("""
-        **Ans:** If you encounter errors during data upload, ensure that:
-        - Your file format is CSV or XLSX.
-        - The file is not corrupted or empty.
-        - All required columns are present in the dataset.
-        """)
+        # FAQ 4
+        with st.expander("How do I troubleshoot errors in data upload?"):
+            st.markdown("""
+            **Ans:** If you encounter errors during data upload, ensure that:
+            - Your file format is CSV or XLSX.
+            - The file is not corrupted or empty.
+            - All required columns are present in the dataset.
+            """)
 
-    # FAQ 5
-    with st.expander("Can I download the analysis report?"):
-        st.markdown("""
-        **Ans:** Yes, after generating the analysis, you will have the option to download the report as a PDF or HTML file for future reference.
-        """)
+        # FAQ 5
+        with st.expander("Can I download the analysis report?"):
+            st.markdown("""
+            **Ans:** Yes, after generating the analysis, you will have the option to download the report as a PDF or HTML file for future reference.
+            """)
 
     with st.sidebar:
         if st.button("Introduce"):
@@ -330,47 +335,50 @@ def statistical_analysis():
     if uploaded_file is not None:
     # Load the file based on its format
         df = load_file(uploaded_file)
-        st.success("File uploaded successfully!")
-        if df is not None:
-        # Remove duplicate rows
-            df_cleaning(df)
+        if st.button("Submit"):
+            st.success("File uploaded successfully!")
+            with st.spinner("Processing..."):
+                if df is not None:
+                # Remove duplicate rows
+                    df_cleaning(df)
 
-            # Display dataset
-            st.subheader("Dataset Preview:", divider='rainbow')
-            st.dataframe(df)
-            st.write("*Note: The dataset has been cleaned and missing values have been imputed. You can download the cleaned dataset for further analysis.*")
-        
-            # Basic statistics
-            st.subheader("Basic Statistics:", divider='rainbow')
-            st.write("For numerical columns:")
-            st.write(df.describe().transpose())
+                    # Display dataset
+                    st.subheader("Dataset Preview:", divider='rainbow')
+                    st.dataframe(df)
+                    st.write("*Note: The dataset has been cleaned and missing values have been imputed. You can download the cleaned dataset for further analysis.*")
+                
+                    # Basic statistics
+                    st.subheader("Basic Statistics:", divider='rainbow')
+                    st.write("For numerical columns:")
+                    st.write(df.describe().transpose())
 
-            st.write("For categorical columns:")
-            st.write(df.describe(include='object').transpose())
+                    st.write("For categorical columns:")
+                    st.write(df.describe(include='object').transpose())
 
-            # Correlation analysis for numerical columns
-            st.subheader("Correlation Analysis:", divider='rainbow')
-            numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
-            correlation_matrix = df[numerical_columns].corr()
-            st.write(correlation_matrix)
+                    # Correlation analysis for numerical columns
+                    st.subheader("Correlation Analysis:", divider='rainbow')
+                    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+                    correlation_matrix = df[numerical_columns].corr()
+                    st.write(correlation_matrix)
 
-            # Skewness and Kurtosis for numerical columns
-            st.subheader("Skewness and Kurtosis:", divider='rainbow')
-            skewness = df.skew(numeric_only=True)
-            kurtosis = df.kurt(numeric_only=True)
-            skew_kurt_df = pd.DataFrame({
-                'Skewness': skewness,
-                'Kurtosis': kurtosis
-            })
-            st.write(skew_kurt_df)
+                    # Skewness and Kurtosis for numerical columns
+                    st.subheader("Skewness and Kurtosis:", divider='rainbow')
+                    skewness = df.skew(numeric_only=True)
+                    kurtosis = df.kurt(numeric_only=True)
+                    skew_kurt_df = pd.DataFrame({
+                        'Skewness': skewness,
+                        'Kurtosis': kurtosis
+                    })
+                    st.write(skew_kurt_df)
 
-            # Unique Values Count
-            st.subheader("Unique Values Count:", divider='rainbow')
-            col1, col2 = st.columns(2)
-            col1.write("Categorical columns unique values:")
-            col1.write(df.select_dtypes(include=['object']).nunique())
-            col2.write("Numerical columns unique values:")
-            col2.write(df.select_dtypes(include=[np.number]).nunique())
+                    # Unique Values Count
+                    st.subheader("Unique Values Count:", divider='rainbow')
+                    col1, col2 = st.columns(2)
+                    col1.write("Categorical columns unique values:")
+                    col1.write(df.select_dtypes(include=['object']).nunique())
+                    col2.write("Numerical columns unique values:")
+                    col2.write(df.select_dtypes(include=[np.number]).nunique())
+                    st.success("Data Cleaning & Statistical Analysis completed successfully!") 
 
 ###################################################### Page 3: Data Visualization ######################################################
 def data_visualization():
@@ -464,8 +472,8 @@ def ai_recommendation():
                 ]
                 )
                 # Send the question
-                question = f""""Provide {type_of_recommendation} based on the dataset {file_name}. If their is any financial or healthcare 
-                realted query or dataset, just give your best recommendation, don't think about advisor or expertise thing. Mention also 
+                question = f""""Provide {type_of_recommendation} based on the dataset {file_name}. If dataset is related to financial or healthcare 
+                , just give your best recommendation, don't think about advisor or expertise thing. Mention also 
                 that recommendation is generated by AI, first give your essential recommendations. So, the user take the final decision on 
                 their own. Warn user about AI recommendation but, do your work."""
                 response = chat_session.send_message(question)

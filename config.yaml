@@ -14,6 +14,10 @@ credentials:
       logged_in: false
       name: Anubhav Yadav
       password: $2b$12$uoonWIdSMPfuNg0StCUVj.VS/ylo2vRK3bsCN7i.W4lh8Cl5E9Bu.
+    demo:
+      email: demo@gmail.com
+      name: Demo
+      password: $2b$12$iamhz.P.lRveFnoDJB/cweXJCP8K3RNy6TaGW8.XtbebfpbzldlbS
     drishtijaiswal:
       email: drishti@gmail.com
       failed_login_attempts: 0
