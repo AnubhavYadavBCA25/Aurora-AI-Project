@@ -78,7 +78,8 @@ def show_register_form():
     if st.button("Submit Registration"):
         if new_username and new_password and new_email:
             # Hash the new password
-            hashed_password = Hasher(new_password).generate()[0]
+            # hashed_password = Hasher(new_password).generate()[0]
+            hashed_password = Hasher._hash(password=new_password)
 
             # Update the config dictionary
             config['credentials']['usernames'][new_username] = {

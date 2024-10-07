@@ -30,10 +30,10 @@ credentials:
       logged_in: false
       name: Eshaan Sabharwal
       password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
-    newuser:
-      email: testing@gmail.com
-      name: New User
-      password: $2b$12$DbL8KPWmeESsb8jSc/1qu.FFohNbr5BKucupixMOjRiLF13IZMoJu
+    rahul:
+      email: rahul@gmail.com
+      name: Rahul Sharma
+      password: $2b$12$.eFxZB8yVVRfBDUuXatco.BzrQlZ.TgS0mYPbNSSSGd2fDBGJLMlm
     shobhit:
       email: shobhitadhya@gmail.com
       name: Shobhit Kumar
@@ -44,7 +44,3 @@ credentials:
       logged_in: false
       name: Sparsh Jaiswal
       password: $2b$12$kOE2qlBMrHN7DJbWmiTGR.ZwV3ee3ntC4tfaieOJedPb8csDb.Qfm
-    tester:
-      email: tester@gmail.com
-      name: Tester Boy
-      password: $2b$12$T79EZJj10bgI7hRfRyzK5eZT5gzA9SNXKnuwE5QN9k8/e4PZMTaFK
