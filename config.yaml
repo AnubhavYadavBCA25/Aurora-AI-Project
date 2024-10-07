@@ -44,3 +44,7 @@ credentials:
       logged_in: false
       name: Sparsh Jaiswal
       password: $2b$12$kOE2qlBMrHN7DJbWmiTGR.ZwV3ee3ntC4tfaieOJedPb8csDb.Qfm
+    tester:
+      email: tester@gmail.com
+      name: Tester Boy
+      password: $2b$12$T79EZJj10bgI7hRfRyzK5eZT5gzA9SNXKnuwE5QN9k8/e4PZMTaFK
