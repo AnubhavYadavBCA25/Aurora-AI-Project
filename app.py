@@ -4,7 +4,6 @@ import csv
 import yaml
 import json
 from PIL import Image
-from gtts import gTTS
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -208,12 +207,6 @@ def extract_csv_data(pathname: str) -> list[str]:
       parts.append(str.join(row))
   return parts
 
-# Function to generate and save TTS audio file
-def generate_tts(text, file_name):
-    tts = gTTS(text, lang="en", tld="co.in")
-    tts.save(file_name)
-    return file_name
-
 ###################################################### Page 1: Introduction Page ######################################################
 def introduction():
     st.header('🤖Aurora: AI Powered Automated Data Analytics Tool', divider='rainbow')
@@ -315,15 +308,7 @@ def introduction():
         with st.expander("Can I download the analysis report?"):
             st.markdown("""
             **Ans:** Yes, after generating the analysis, you will have the option to download the report as a PDF or HTML file for future reference.
-            """)
-
-    with st.sidebar:
-        if st.button("Introduce"):
-            # with st.spinner("Processing..."):
-            #     audio_file = generate_tts(intro_text + feature_text, "intro_features.mp3")
-            #     audio = open(audio_file, "rb")
-            #     audio_bytes = audio.read()
-            st.audio('animations_and_audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
+            """)           
     # st.divider()
 
 ###################################################### Page 2: Statistical Analysis ######################################################
