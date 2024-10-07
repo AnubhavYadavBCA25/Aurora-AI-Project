@@ -43,7 +43,7 @@ def show_login_form():
         config['cookie']['name'],
         config['cookie']['key'],
         config['cookie']['expiry_days'],
-        config['pre-authorized']
+        # config['register_user']
     )
 
     # Creating a login widget

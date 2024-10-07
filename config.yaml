@@ -40,6 +40,3 @@ credentials:
       logged_in: false
       name: Sparsh Jaiswal
       password: $2b$12$kOE2qlBMrHN7DJbWmiTGR.ZwV3ee3ntC4tfaieOJedPb8csDb.Qfm
-pre-authorized:
-  emails:
-  - anubhavyadavff@gmail.com
