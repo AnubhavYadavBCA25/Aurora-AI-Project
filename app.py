@@ -13,6 +13,7 @@ import seaborn as sns
 from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
+from streamlit_authenticator.utilities.hasher import Hasher
 from ydata_profiling import ProfileReport
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -77,7 +78,7 @@ def show_register_form():
     if st.button("Submit Registration"):
         if new_username and new_password and new_email:
             # Hash the new password
-            hashed_password = stauth.Hasher([new_password]).generate()[0]
+            hashed_password = Hasher([new_password]).generate()[0]
 
             # Update the config dictionary
             config['credentials']['usernames'][new_username] = {
@@ -131,16 +132,19 @@ model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generati
 
 ###################################################### Functions ######################################################
 # Function for loading csv format file
+@st.cache_data
 def load_csv_format(file):
         df = pd.read_csv(file)
         return df
     
 # Function for loading xlsx format file
+@st.cache_data
 def load_xlsx_format(file):
         df = pd.read_excel(file)
         return df
 
 # Function for loading file based on its format
+@st.cache_data
 def load_file(uploaded_file):
     if uploaded_file.name.endswith('.csv'):
             return load_csv_format(uploaded_file)
@@ -173,6 +177,7 @@ def load_lottie_file(filepath: str):
         return json.load(file)
 
 # Function for generating report
+@st.cache_data
 def generate_report(df,file):
     # Generate profiling report
     profile = ProfileReport(df, title="Dataset Report", explorative=True)
@@ -183,11 +188,12 @@ def generate_report(df,file):
     return output_path
 
 # Function for uploading file to Gemini
+@st.cache_data
 def upload_to_gemini(path, mime_type=None):
     file = genai.upload_file(path, mime_type=mime_type)
     print(f"Uploaded file '{file.display_name}' as: {file.uri}")
     return file
-
+@st.cache_data
 def wait_for_files_active(files):
     for name in (file.name for file in files):
         file = genai.get_file(name)
@@ -198,6 +204,8 @@ def wait_for_files_active(files):
             if file.state.name != "ACTIVE":
                 raise Exception(f"File {file.name} failed to process")
 
+# Function for extracting csv data
+@st.cache_data
 def extract_csv_data(pathname: str) -> list[str]:
   parts = [f"---START OF CSV ${pathname} ---"]
   with open(pathname, "r", newline="") as csvfile:
@@ -259,7 +267,7 @@ def introduction():
         st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
     with right_column:
         gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
-        st_lottie.st_lottie(gemini_logo, key='logo', height=450, width=450 ,loop=True)
+        st_lottie.st_lottie(gemini_logo, key='logo', height=400, width=400 ,loop=True)
     st.divider()
 
     # Demo Video

@@ -30,6 +30,10 @@ credentials:
       logged_in: false
       name: Eshaan Sabharwal
       password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
+    newuser:
+      email: testing@gmail.com
+      name: New User
+      password: $2b$12$DbL8KPWmeESsb8jSc/1qu.FFohNbr5BKucupixMOjRiLF13IZMoJu
     shobhit:
       email: shobhitadhya@gmail.com
       name: Shobhit Kumar
