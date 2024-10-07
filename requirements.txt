@@ -10,3 +10,4 @@ openpyxl
 python-dotenv
 streamlit-lottie
 ydata-profiling
+setuptools
