@@ -248,7 +248,7 @@ def introduction():
     
     with left_column:
         features = load_lottie_file('animations_and_audios/features.json')
-        st_lottie.st_lottie(features, key='features', height=350, width=350 ,loop=True)
+        st_lottie.st_lottie(features, key='features', height=400, width=400 ,loop=True)
     st.divider()
 
     left_column, right_column = st.columns(2)
@@ -261,11 +261,12 @@ def introduction():
                     - **Step 4:** After selecting the project, click on "Create API key in existing  project" to generate the API Key.
                     - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
                     - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
+                    - **Refrence YouTube Link:** [How to get Gemini API Key?](https://youtu.be/o8iyrtQyrZM?si=rbEusy-s0l94Lazn)
                     ''')
         st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
     with right_column:
         gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
-        st_lottie.st_lottie(gemini_logo, key='logo', height=350, width=350 ,loop=True)
+        st_lottie.st_lottie(gemini_logo, key='logo', height=450, width=450 ,loop=True)
     st.divider()
 
     # Demo Video
@@ -323,7 +324,7 @@ def introduction():
             #     audio = open(audio_file, "rb")
             #     audio_bytes = audio.read()
             st.audio('animations_and_audios/intro_features.mp3', format="audio/mp3", autoplay=True, start_time=0)            
-    st.divider()
+    # st.divider()
 
 ###################################################### Page 2: Statistical Analysis ######################################################
 def statistical_analysis():
