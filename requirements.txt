@@ -5,7 +5,7 @@ matplotlib
 seaborn
 streamlit==1.38.0
 google-generativeai
-streamlit-authenticator
+streamlit-authenticator==0.4.1
 openpyxl
 python-dotenv
 streamlit-lottie
