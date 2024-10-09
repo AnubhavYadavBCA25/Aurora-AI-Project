@@ -193,7 +193,7 @@ def upload_to_gemini(path, mime_type=None):
     file = genai.upload_file(path, mime_type=mime_type)
     print(f"Uploaded file '{file.display_name}' as: {file.uri}")
     return file
-@st.cache_data
+# @st.cache_data
 def wait_for_files_active(files):
     for name in (file.name for file in files):
         file = genai.get_file(name)
@@ -636,22 +636,22 @@ def about_us():
         st_lottie.st_lottie(drishti_profile, key='drishti', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.subheader("Satyam Kumar", divider='rainbow')
-        st.markdown('''
-                    - **Role:** Developer
-                    - **Email:** [![Satyam Email](https://img.icons8.com/color/30/email.png)](iamsatyam9798@gmail.com)
-                    - **LinkedIn:** [![Satyam Kumar LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/satyam-kumar-63419a251/)
-                    - **GitHub:** [![Satyam Kumar GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/satyamkr21)
-                    - **Bio:** Satyam Kumar, an AI developer and ML enthusiast, pursuing BCA in Data Science, blends AI with intuitive 
-                        web design to create seamless user experiences, driven by innovation and a passion for impactful solutions.
-                        He is skilled in maintaining the content and design of the website.
-                    ''')
-    with right_column:
-        satyam_profile = load_lottie_file('profile_animations/satyam_profile.json')
-        st_lottie.st_lottie(satyam_profile, key='satyam', height=305, width=305 ,loop=True, quality='high')
-    st.divider()
+    # left_column, right_column = st.columns(2)
+    # with left_column:
+    #     st.subheader("Satyam Kumar", divider='rainbow')
+    #     st.markdown('''
+    #                 - **Role:** Developer
+    #                 - **Email:** [![Satyam Email](https://img.icons8.com/color/30/email.png)](iamsatyam9798@gmail.com)
+    #                 - **LinkedIn:** [![Satyam Kumar LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/satyam-kumar-63419a251/)
+    #                 - **GitHub:** [![Satyam Kumar GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/satyamkr21)
+    #                 - **Bio:** Satyam Kumar, an AI developer and ML enthusiast, pursuing BCA in Data Science, blends AI with intuitive 
+    #                     web design to create seamless user experiences, driven by innovation and a passion for impactful solutions.
+    #                     He is skilled in maintaining the content and design of the website.
+    #                 ''')
+    # with right_column:
+    #     satyam_profile = load_lottie_file('profile_animations/satyam_profile.json')
+    #     st_lottie.st_lottie(satyam_profile, key='satyam', height=305, width=305 ,loop=True, quality='high')
+    # st.divider()
 
     # Footer
     st.markdown(
