@@ -52,16 +52,14 @@ Aurora AI is not just a tool; it's a comprehensive solution for modern data chal
 - Performs complex data analysis based on natural language user queries
 - Supports a wide range of analytical questions, from simple summaries to complex correlations
 
-### VisionFusion (New!)
+### VisionFusion
 - AI-powered image analysis capabilities
 - Features include:
-  - Object detection and classification in images
-  - Facial recognition and emotion detection
   - Text extraction from images (OCR)
-  - Image similarity comparison
+  - Image based data analysis
   - Visual content moderation
 
-### FutureCast AI (New!)
+### FutureCast AI
 - AI-driven recommendation system based on dataset analysis
 - Provides actionable insights and future predictions
 - Features include:
@@ -72,12 +70,11 @@ Aurora AI is not just a tool; it's a comprehensive solution for modern data chal
 
 ## Technology Stack
 
-- **Backend:** Python 3.x
+- **Backend:** Python 3.12
 - **Frontend:** Streamlit
 - **Data Processing:** Pandas, NumPy
 - **Visualization:** Matplotlib, Seaborn
 - **AI Integration:** Google Generative AI (Gemini API)
-- **Image Processing:** OpenCV, TensorFlow
 - **Authentication:** Streamlit-Authenticator
 - **Configuration:** YAML, python-dotenv
 
@@ -110,47 +107,10 @@ Aurora AI is not just a tool; it's a comprehensive solution for modern data chal
    streamlit run app.py
    ```
 
-## Authentication
-
-User management is handled via the `config.yaml` file. The structure is as follows:
-
-```yaml
-credentials:
-  usernames:
-    user1:
-      name: Full Name
-      password: hashed_password
-      email: user@example.com
-```
-
-To add new users, update this file and restart the application.
-
-## Development Architecture
-
-- Modular architecture for easy feature expansion and maintenance
-- Utilizes Streamlit's session state for efficient data persistence across app interactions
-- Implements comprehensive error handling and user feedback mechanisms
-- Follows best practices for code organization and documentation
-
 ## License
-
-This project is licensed under the MIT License. See the [LICENSE.md](LICENSE.md) file for details.
-
-## Team Aurora
-
-- **Anubhav Yadav** - Lead Developer
-  - [LinkedIn](https://www.linkedin.com/in/anubhav-yadav-data-science/)
-- **Sparsh Jaiswal** - Developer
-  - [LinkedIn](https://www.linkedin.com/in/sparsh-jaiswal-aa903730b/)
-- **Eshaan Sabharwal** - Developer
-  - [LinkedIn](https://www.linkedin.com/in/eshaan-sabharwal-b73a201b2)
-- **Drishti Jaiswal** - Developer
-  - [LinkedIn](http://linkedin.com/in/drishti-jaiswal-40331627b)
-- **Satyam Kumar** - Developer
-  - [LinkedIn](https://www.linkedin.com/in/satyam-kumar-63419a251/)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
-
 - Thanks to Anthropic for providing the Gemini API
 - Special thanks to all users and supporters of Aurora AI
 
