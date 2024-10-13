@@ -218,58 +218,62 @@ def extract_csv_data(pathname: str) -> list[str]:
 ###################################################### Page 1: Introduction Page ######################################################
 def introduction():
     st.header('🤖Aurora: AI Powered Automated Data Analytics Tool', divider='rainbow')
-    robot_file = load_lottie_file('animations_and_audios/robot.json')
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.subheader("Introduction", divider='rainbow')
-        intro_text = ('''
-                    - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, AI powered recommendations, automated data report generation and AI-powered dataset chatbot.
-                    - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
-                    - The tool is built using Python, Streamlit, and Gemini API for AI-powered content generation.
-                    - It offers a wide range of features to help users explore, analyze, and gain insights from their data.
-                    - The tool is equipped with AI models that can generate data visualizations, recommendation models, and automated data report generation based on user input.
-                ''')
-        st.markdown(intro_text)
-
-    with right_column:
-        st_lottie.st_lottie(robot_file, key='robot', height=450, width=450 ,loop=True)
-    st.divider()
-
-    left_column, right_column = st.columns(2)
-    with right_column:
-        st.subheader("Features:", divider='rainbow')
-        feature_text = ('''
-                    - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
-                    - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
-                    - **FutureCast AI:** A feature for AI-based recommendations. Where you can get present and future insights based on the dataset.
-                    - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
-                    - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.
-                    - **VisionFusion:** A feature for AI-powered image analysis. Where you can analyze the images using AI models.''')
-        st.markdown(feature_text)
     
-    with left_column:
-        features = load_lottie_file('animations_and_audios/features.json')
-        st_lottie.st_lottie(features, key='features', height=400, width=400 ,loop=True)
-    st.divider()
-
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.subheader('How To Get Gemini API Key?', divider='rainbow')
-        st.markdown('''
-                    - **Step 1:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and sign up for an account.
-                    - **Step 2:** After signing up, click on "Create API Key".
-                    - **Step 3:** Select exsisting project or create a "New Project" on [Google Cloud Platform](https://console.cloud.google.com/).
-                    - **Step 4:** After selecting the project, click on "Create API key in existing  project" to generate the API Key.
-                    - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
-                    - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
-                    - **Refrence YouTube Link:** [How to get Gemini API Key?](https://youtu.be/o8iyrtQyrZM?si=rbEusy-s0l94Lazn)
+    with st.container(border=False):
+        left_column, right_column = st.columns(2)
+        with left_column:
+            st.subheader("Introduction", divider='rainbow')
+            intro_text = ('''
+                        - **Aurora AI** is an AI-powered data analytics tool that provides a user-friendly interface for data cleaning, statistical analysis, data visualization, AI powered recommendations, automated data report generation and AI-powered dataset chatbot.
+                        - It is designed to help users with little to no programming experience to perform complex data analysis tasks with ease.
+                        - The tool is built using Python, Streamlit, and Gemini API for AI-powered content generation.
+                        - It offers a wide range of features to help users explore, analyze, and gain insights from their data.
+                        - The tool is equipped with AI models that can generate data visualizations, recommendation models, and automated data report generation based on user input.
                     ''')
-        st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
-    with right_column:
-        gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
-        st_lottie.st_lottie(gemini_logo, key='logo', height=400, width=400 ,loop=True)
+            st.markdown(intro_text)
+
+        with right_column:
+            robot_file = load_lottie_file('animations_and_audios/robot.json')
+            st_lottie.st_lottie(robot_file, key='robot', height=450, width=450 ,loop=True)
     st.divider()
 
+    with st.container(border=False):
+        left_column, right_column = st.columns(2)
+        with right_column:
+            st.subheader("Features:", divider='rainbow')
+            feature_text = ('''
+                        - **CleanStats:** A feature for data cleaning and statistical analysis. Where you can clean the data and get the basic statistics.
+                        - **AutoViz:** A feature for data visualization and EDA. Where you can visualize the data using different plots.
+                        - **FutureCast AI:** A feature for AI-based recommendations. Where you can get present and future insights based on the dataset.
+                        - **InsightGen:** A feature for generating automated data reports. Where you can download the report in interactive HTML format.
+                        - **SmartQuery:** A feature for AI-powered dataset chatbot. Where you can chat with the CSV data file and get the response.
+                        - **VisionFusion:** A feature for AI-powered image analysis. Where you can analyze the images using AI models.''')
+            st.markdown(feature_text)
+        
+        with left_column:
+            features = load_lottie_file('animations_and_audios/features.json')
+            st_lottie.st_lottie(features, key='features', height=400, width=400 ,loop=True)
+    st.divider()
+
+    with st.container(border=False):
+        left_column, right_column = st.columns(2)
+        with left_column:
+            st.subheader('How To Get Gemini API Key?', divider='rainbow')
+            st.markdown('''
+                        - **Step 1:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey) and sign up for an account.
+                        - **Step 2:** After signing up, click on "Create API Key".
+                        - **Step 3:** Select exsisting project or create a "New Project" on [Google Cloud Platform](https://console.cloud.google.com/).
+                        - **Step 4:** After selecting the project, click on "Create API key in existing  project" to generate the API Key.
+                        - **Step 5:** Copy the API Key and paste it in the Gemini API Key input box in the sidebar.
+                        - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
+                        - **Refrence YouTube Link:** [How to get Gemini API Key?](https://youtu.be/o8iyrtQyrZM?si=rbEusy-s0l94Lazn)
+                        ''')
+            st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
+        with right_column:
+            gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
+            st_lottie.st_lottie(gemini_logo, key='logo', height=400, width=400 ,loop=True)
+    st.divider()
+    
     # Demo Video
     # st.subheader("Demo Video:", divider='rainbow')
     # pass
