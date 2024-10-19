@@ -572,73 +572,24 @@ def vision_analysis():
 ###################################################### Page 8: About Us ######################################################
 def about_us():
     st.header('👨‍💻About Us: Meet Team Aurora', divider='rainbow')
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.subheader("Anubhav Yadav", divider='rainbow')
-        st.markdown('''
-                    - **Role:** Lead Developer
-                    - **Email:** [![Anubhav Email](https://img.icons8.com/color/30/email.png)](yadavanubhav2024@gmail.com)
-                    - **LinkedIn:** [![Anubhav Yadav LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/anubhav-yadav-data-science/)
-                    - **GitHub:** [![Anubhav Yadav GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://www.github.com/AnubhavYadavBCA25)
-                    - **Bio:** Anubhav is a Data Science Enthusiast with a passion for building AI-powered applications. He is skilled in 
-                                Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
-                                specializing in Data Science.
-                    ''')
-    with right_column:
-        anubhav_profile = load_lottie_file('profile_animations/anubhav_profile.json')
-        st_lottie.st_lottie(anubhav_profile, key='anubhav', height=305, width=305 ,loop=True, quality='high')
+    
+    with st.container(border=True):
+        left_column, right_column = st.columns(2)
+        with left_column:
+            st.subheader("Anubhav Yadav", divider='rainbow')
+            st.markdown('''
+                        - **Role:** Lead Developer
+                        - **Email:** [![Anubhav Email](https://img.icons8.com/color/30/email.png)](yadavanubhav2024@gmail.com)
+                        - **LinkedIn:** [![Anubhav Yadav LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/anubhav-yadav-data-science/)
+                        - **GitHub:** [![Anubhav Yadav GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://www.github.com/AnubhavYadavBCA25)
+                        - **Bio:** Anubhav is a Data Science Enthusiast with a passion for building AI-powered applications. He is skilled in 
+                                    Python, Machine Learning, and Data Analysis. He is currently pursuing a Bachelor's degree in Computer Applications 
+                                    specializing in Data Science.
+                        ''')
+        with right_column:
+            anubhav_profile = load_lottie_file('profile_animations/anubhav_profile.json')
+            st_lottie.st_lottie(anubhav_profile, key='anubhav', height=305, width=305 ,loop=True, quality='high')
     st.divider()
-
-    # left_column, right_column = st.columns(2)
-    # with right_column:
-    #     st.subheader("Sparsh Jaiswal", divider='rainbow')
-    #     st.markdown('''
-    #                 - **Role:** Developer
-    #                 - **Email:** [![Sparsh Email](https://img.icons8.com/color/30/email.png)](sparshjaiswal10@gmail.com)
-    #                 - **LinkedIn:** [![Sparsh Jaiswal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://http://www.linkedin.com/in/sparsh-jaiswal-aa903730b/)
-    #                 - **GitHub:** [![Sparsh Jaiswal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/sparshjais)
-    #                 - **Bio:** Sparsh Jaiswal is a passionate AI developer and ML enthusiast, currently pursuing a BCA in Data Science. 
-    #                     With a strong foundation in python and front-end development, Sparsh is dedicated to blending the power of AI with 
-    #                     intuitive web design to craft seamless and engaging user experiences.
-    #                 ''')
-    # with left_column:
-    #     sparsh_profile = load_lottie_file('profile_animations/sparsh_profile.json')
-    #     st_lottie.st_lottie(sparsh_profile, key='sparsh', height=305, width=305 ,loop=True, quality='high')
-    # st.divider()
-
-    # left_column, right_column = st.columns(2)
-    # with left_column:
-    #     st.subheader("Eshaan Sabharwal", divider='rainbow')
-    #     st.markdown('''
-    #                 - **Role:** Developer
-    #                 - **Email:** [![Eshaan Email](https://img.icons8.com/color/30/email.png)](eshaansabharwal@gmail.com)
-    #                 - **LinkedIn:** [![Eshaan Sabharwal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/eshaan-sabharwal-b73a201b2)
-    #                 - **GitHub:** [![Eshaan Sabharwal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/EshaanSabharwal)
-    #                 - **Bio:** Eshaan Sabharwal is an aspiring AI developer and web enthusiast pursuing a BCA in Data Science. 
-    #                     Skilled in front-end development and eager to integrate AI into web applications, Eshaan combines technical 
-    #                     expertise with a passion for innovation to create user-friendly digital experiences.
-    #                 ''')
-    # with right_column:
-    #     eshaan_profile = load_lottie_file('profile_animations/eshaan_profile.json')
-    #     st_lottie.st_lottie(eshaan_profile, key='eshaan', height=305, width=305 ,loop=True, quality='high')
-    # st.divider()
-
-    # left_column, right_column = st.columns(2)
-    # with right_column:
-    #     st.subheader("Drishti Jaiswal", divider='rainbow')
-    #     st.markdown('''
-    #                 - **Role:** Developer
-    #                 - **Email:** [![Drishti Email](https://img.icons8.com/color/30/email.png)](Drishti.jaiswal111@gmail.com)
-    #                 - **LinkedIn:** [![Drishti Jaiswal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](http://linkedin.com/in/drishti-jaiswal-40331627b)
-    #                 - **GitHub:** [![Drishti Jaiswal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/drishti-jaiswal)
-    #                 - **Bio:** Drishti Jaiswal is a data science student at SRM Institute, skilled in Python and machine learning. 
-    #                     With certifications in data analytics, she's passionate about applying her knowledge to innovative projects in 
-    #                     the field. She's dedicated to creating impactful solutions that leverage the power of AI to drive change.
-    #                 ''')
-    # with left_column:
-    #     drishti_profile = load_lottie_file('profile_animations/drishti_profile.json')
-    #     st_lottie.st_lottie(drishti_profile, key='drishti', height=305, width=305 ,loop=True, quality='high')
-    # st.divider()
 
     # Footer
     st.markdown(
