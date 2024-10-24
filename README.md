@@ -107,6 +107,9 @@ Aurora AI is not just a tool; it's a comprehensive solution for modern data chal
    streamlit run app.py
    ```
 
+## Aurora Web App Link:
+Link: https://aurora-ai.streamlit.app/
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
