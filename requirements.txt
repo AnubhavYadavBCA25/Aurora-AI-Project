@@ -11,3 +11,4 @@ python-dotenv
 streamlit-lottie
 ydata-profiling
 setuptools
+st-gsheets-connection==0.1.0

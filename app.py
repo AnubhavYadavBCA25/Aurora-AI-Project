@@ -14,6 +14,7 @@ from yaml.loader import SafeLoader
 import streamlit_authenticator as stauth
 from streamlit_authenticator.utilities import LoginError
 from streamlit_authenticator.utilities.hasher import Hasher
+from streamlit_gsheets import GSheetsConnection
 from ydata_profiling import ProfileReport
 import google.generativeai as genai
 from dotenv import load_dotenv
@@ -129,6 +130,14 @@ config_for_chatbot = {
     "response_mime_type": "text/plain"
 }
 model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generation_config=config_for_chatbot)
+
+###################################################### Google Sheets Connection #######################################
+# Establish a connection to Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+# Read the data from Google Sheets
+feedback_df = conn.read(worksheet="Feedback Data", ttl=60)
+query_df = conn.read(worksheet="Query Data", ttl=60)
 
 ###################################################### Functions ######################################################
 # Function for loading csv format file
@@ -569,6 +578,80 @@ def vision_analysis():
                 st.write(response.text)
                 st.success("Image analyzed successfully!")
 
+###################################################### Page 8: Contact Us ####################################################
+def contact_us():
+    st.header('📧Contact Us', divider='rainbow')
+    st.subheader("Have a query 🤔 or feedback 😀? Reach out to us ⬇️!", divider='rainbow')
+
+    # Select the action
+    action = st.selectbox("Select an action:", ["Query", "Feedback"])
+    # Contact Form
+    if action == "Feedback":
+        with st.form(key='contact_form'):
+            name = st.text_input("Name*", key='user_name')
+            email = st.text_input("Email*", key='user_email')
+            ratings = st.radio("Ratings*", [1, 2, 3, 4, 5], key='rating')
+            message = st.text_area("Message*", key='message')
+            st.markdown("**Required*")
+            submit_button = st.form_submit_button("Submit")
+            if submit_button:
+                if not name or not email or not message:
+                    st.error("Please fill in the required fields.")
+                    st.stop()
+                elif feedback_df["Email"].str.contains(email).any():
+                    st.warning("You have already submitted a feedback.")
+                    st.stop()
+                else:
+                    user_feedback_data = pd.DataFrame({
+                        "Name": name,
+                        "Email": email,
+                        "Ratings": ratings,
+                        "Message": message
+                    }, index=[0])
+                    
+                    # Update the feedback data
+                    updated_df = pd.concat([feedback_df, user_feedback_data], ignore_index=True)
+
+                    # Update Google Sheets with new Feedback Data
+                    conn.update(worksheet="Feedback Data", data=updated_df)
+                    st.success("Feedback submitted successfully!")
+
+    if action == "Query":
+        with st.form(key='contact_form'):
+            name = st.text_input("Name*", key="user_name")
+            email = st.text_input("Email*", key="user_email")
+            subject = st.text_input("Subject*", key="subject")
+            message = st.text_area("Message*", placeholder="Explain your query in detail.", key="message")
+            check_box = st.checkbox("I agree to be contacted for further details.", key="check_box")
+            st.markdown("**Required*")
+            submit_button = st.form_submit_button("Submit")
+            if submit_button:
+                if not name or not email or not subject or not message:
+                    st.error("Please fill in the required fields.")
+                    st.stop()
+                elif not check_box:
+                    st.error("Please agree to be contacted for further details.")
+                    st.stop()
+                else:
+                    query_df["Email"] = query_df["Email"].astype(str)                 
+                    if query_df["Email"].str.contains(email).any():
+                      st.warning("You have already submitted a query.")
+                      st.stop()
+                    else:
+                        user_query_data = pd.DataFrame({
+                            "Name": name,
+                            "Email": email,
+                            "Subject": subject,
+                            "Message": message
+                        }, index=[0])
+                        
+                        # Update the query data
+                        updated_df = pd.concat([query_df, user_query_data], ignore_index=True)
+
+                        # Update Google Sheets with new Query Data
+                        conn.update(worksheet="Query Data", data=updated_df)
+                        st.success("Query submitted successfully!")
+            
 ###################################################### Page 8: About Us ######################################################
 def about_us():
     st.header('👨‍💻About Us: Meet Team Aurora', divider='rainbow')
@@ -611,6 +694,7 @@ if st.session_state["authentication_status"]:
         st.Page(analysis_report, title='InsightGen', icon='📑'),
         st.Page(ai_data_file_chatbot, title='SmartQuery', icon='🤖'),
         st.Page(vision_analysis, title='VisionFusion', icon='👁️'),
+        st.Page(contact_us, title='Contact Us', icon='📧'),
         st.Page(about_us, title='About Us', icon='👨‍💻')
     ])
     pg.run()
