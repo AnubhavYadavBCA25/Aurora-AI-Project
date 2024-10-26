@@ -277,7 +277,7 @@ def introduction():
                         - **Step 6:** Now, you are ready to use the Aurora AI tool for data analysis.
                         - **Refrence YouTube Link:** [How to get Gemini API Key?](https://youtu.be/o8iyrtQyrZM?si=rbEusy-s0l94Lazn)
                         ''')
-            st.info("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
+            st.warning("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
         with right_column:
             gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
             st_lottie.st_lottie(gemini_logo, key='logo', height=400, width=400 ,loop=True)
@@ -317,19 +317,22 @@ def introduction():
             """)
 
         # FAQ 4
-        with st.expander("How do I troubleshoot errors in data upload?"):
+        with st.expander("Can I download the analysis report?"):
             st.markdown("""
-            **Ans:** If you encounter errors during data upload, ensure that:
-            - Your file format is CSV or XLSX.
-            - The file is not corrupted or empty.
-            - All required columns are present in the dataset.
+            **Ans:** Yes, after generating the analysis, you will have the option to download the report as a HTML file for future reference.
             """)
 
         # FAQ 5
-        with st.expander("Can I download the analysis report?"):
+        with st.expander("How secure is my data?"):
             st.markdown("""
-            **Ans:** Yes, after generating the analysis, you will have the option to download the report as a PDF or HTML file for future reference.
-            """)           
+            **Ans:** We take data security seriously and ensure that your data is encrypted and stored securely. We do not share your data with third parties.
+            """)
+        
+        # FAQ 6
+        with st.expander("How can I provide feedback or report issues?"):
+            st.markdown("""
+            **Ans:** You can provide feedback or report issues by navigating to the 'Contact Us' section in the sidebar and filling out the form.
+            """)
     # st.divider()
 
 ###################################################### Page 2: Statistical Analysis ######################################################
