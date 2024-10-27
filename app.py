@@ -339,119 +339,127 @@ def introduction():
 def statistical_analysis():
     st.header('🧹CleanStats: Cleaning & Statistical Analysis', divider='rainbow')
     # Upload dataset
-    st.write('Upload a dataset for cleaning and statistical analysis:')
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    with st.form(key='data_cleaning_form'):
+        st.write('Upload a dataset for cleaning and statistical analysis:')
+        # Upload dataset
+        uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+
+        # Submit button
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            st.success("File uploaded successfully!")
 
     if uploaded_file is not None:
     # Load the file based on its format
         df = load_file(uploaded_file)
-        if st.button("Submit"):
-            st.success("File uploaded successfully!")
-            with st.spinner("Processing..."):
-                if df is not None:
-                # Remove duplicate rows
-                    df_cleaning(df)
+        with st.spinner("Processing..."):
+            if df is not None:
+            # Remove duplicate rows
+                df_cleaning(df)
 
-                    # Display dataset
-                    st.subheader("Dataset Preview:", divider='rainbow')
-                    st.dataframe(df)
-                    st.write("*Note: The dataset has been cleaned and missing values have been imputed. You can download the cleaned dataset for further analysis.*")
+                # Display dataset
+                st.subheader("Dataset Preview:", divider='rainbow')
+                st.dataframe(df)
+                st.write("*Note: The dataset has been cleaned and missing values have been imputed. You can download the cleaned dataset for further analysis.*")
                 
-                    # Basic statistics
-                    st.subheader("Basic Statistics:", divider='rainbow')
-                    st.write("For numerical columns:")
-                    st.write(df.describe().transpose())
+                # Basic statistics
+                st.subheader("Basic Statistics:", divider='rainbow')
+                st.write("For numerical columns:")
+                st.write(df.describe().transpose())
 
-                    st.write("For categorical columns:")
-                    st.write(df.describe(include='object').transpose())
+                st.write("For categorical columns:")
+                st.write(df.describe(include='object').transpose())
 
-                    # Correlation analysis for numerical columns
-                    st.subheader("Correlation Analysis:", divider='rainbow')
-                    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
-                    correlation_matrix = df[numerical_columns].corr()
-                    st.write(correlation_matrix)
+                # Correlation analysis for numerical columns
+                st.subheader("Correlation Analysis:", divider='rainbow')
+                numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+                correlation_matrix = df[numerical_columns].corr()
+                st.write(correlation_matrix)
 
-                    # Skewness and Kurtosis for numerical columns
-                    st.subheader("Skewness and Kurtosis:", divider='rainbow')
-                    skewness = df.skew(numeric_only=True)
-                    kurtosis = df.kurt(numeric_only=True)
-                    skew_kurt_df = pd.DataFrame({
-                        'Skewness': skewness,
-                        'Kurtosis': kurtosis
-                    })
-                    st.write(skew_kurt_df)
+                # Skewness and Kurtosis for numerical columns
+                st.subheader("Skewness and Kurtosis:", divider='rainbow')
+                skewness = df.skew(numeric_only=True)
+                kurtosis = df.kurt(numeric_only=True)
+                skew_kurt_df = pd.DataFrame({
+                    'Skewness': skewness,
+                    'Kurtosis': kurtosis
+                })
+                st.write(skew_kurt_df)
 
-                    # Unique Values Count
-                    st.subheader("Unique Values Count:", divider='rainbow')
-                    col1, col2 = st.columns(2)
-                    col1.write("Categorical columns unique values:")
-                    col1.write(df.select_dtypes(include=['object']).nunique())
-                    col2.write("Numerical columns unique values:")
-                    col2.write(df.select_dtypes(include=[np.number]).nunique())
-                    st.success("Data Cleaning & Statistical Analysis completed successfully!") 
+                # Unique Values Count
+                st.subheader("Unique Values Count:", divider='rainbow')
+                col1, col2 = st.columns(2)
+                col1.write("Categorical columns unique values:")
+                col1.write(df.select_dtypes(include=['object']).nunique())
+                col2.write("Numerical columns unique values:")
+                col2.write(df.select_dtypes(include=[np.number]).nunique())
+                st.success("Data Cleaning & Statistical Analysis completed successfully!")
 
 ###################################################### Page 3: Data Visualization ######################################################
 def data_visualization():
     st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
-    # Upload dataset
-    st.write('Upload a dataset to visualize:')
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+    # Create a form for uploading the dataset, selecting the visualization type, and entering the columns
+    with st.form(key='data_visualization_form'):
+        st.write("Upload a dataset to generate visualizations.")
+        # Upload dataset
+        uploaded_file = st.file_uploader("Choose a file")
+        
+        # Select the visualization type
+        visualization_type = st.selectbox("Select the visualization type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Heatmap", "Pie Chart", "Violin Plot", "Count Plot",  "KDE Plot"])
+        
+        # Enter the columns for visualization
+        user_input = st.text_input("Enter the columns for visualization separated by 'and', Example: column1 and column2")
+        
+        # Submit button
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            st.success("File and visualization type submitted successfully!")
     
-    if uploaded_file is not None:
-        # Load the file based on its format
-        df = load_file(uploaded_file)
-        st.success("File uploaded successfully!")
-        file_name = uploaded_file.name
-        # For demonstration, saving the uploaded file temporarily (optional)
-        file_path = os.path.join(os.getcwd(), file_name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        if df is not None:
-            # Apply data cleaning function
-            df_cleaning(df)
+    with st.spinner("Generating Visualization..."):
+        # Check if the file, visualization type, and user input are provided before generating the visualization
+        if uploaded_file and visualization_type and user_input is not None:
+            # Get file name and path
+            file_name = uploaded_file.name
+            file_path = os.path.join("uploads", file_name)
 
-            # Display dataset
-            st.subheader("Dataset Preview:", divider='rainbow')
-            df_sample = str(df.head(5))
-            df_for_vis = df.head(5)
-            st.dataframe(df_for_vis)
-            st.divider()
+            # Load the file based on its format and clean the data
+            df = load_file(uploaded_file)
+            df = df_cleaning(df)
 
-            # Select the type of visualization
-            st.write('Select the type of visualization:')
-            visualization_type = st.selectbox("Visualization Type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Heatmap", "Pie Chart", "Violin Plot", "Count Plot",  "KDE Plot"])
-            st.divider()
+            # Extract a sample of the dataset for model understanding
+            df_sample = str(df.head())
+            # Columns for visualization
+            columns = user_input
+            
+            # Add a subheader for the visualization
+            st.subheader(f"{visualization_type} Visualization for the dataset '{file_name}' for the columns {columns}:")
+            
+            # Provide a predefined prompt for the model
+            predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
+            Plot for the dataset columns {columns}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
+            Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
+            
+            # Generate the code for the visualization
+            response = model.generate_content(predefined_prompt, generation_config=config)
+            generated_code = response.text
+            generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+            
+            # Modify the code to insert the actual file path into pd.read_csv()
+            if "pd.read_csv" in generated_code:
+                generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+            elif "pd.read_excel" in generated_code:
+                generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
 
-            # User Prompt for selecting columns
-            st.write('Enter Columns You Want To Plot:')
-            prompt = st.text_input("Prompt")
+            # Display the generated code
+            st.code(generated_code, language='python')
 
-            # Call the AI model to generate the visualization code and display the visualization
-            if st.button("Visualize"):
-                with st.spinner("Processing..."):
-                    st.subheader(f"{visualization_type} Visualization:")
-                    if uploaded_file is None:
-                        st.error("Please upload a file first.")
-                    else:
-                        predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
-                        Plot for the dataset columns {prompt}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
-                        Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
-                        response = model.generate_content(predefined_prompt, generation_config=config)
-                        generated_code = response.text
-                        generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-                        
-                        # Modify the code to insert the actual file path into pd.read_csv()
-                        if "pd.read_csv" in generated_code:
-                            generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-                        elif "pd.read_excel" in generated_code:
-                            generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-                        st.code(generated_code, language='python')
-                        try:
-                            exec(generated_code)
-                            st.pyplot(plt.gcf())
-                        except Exception as e:
-                            st.error(e)
-                        st.success("Visualization generated successfully!")
+            # Execute the generated code to plot the visualization
+            try:
+                exec(generated_code)
+                st.pyplot(plt.gcf())
+            except Exception as e:
+                st.error(e)
+            st.success("Visualization generated successfully!")
 
 ###################################################### Page 4: AI Based Recommendations ######################################################
 def ai_recommendation():

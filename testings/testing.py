@@ -10,26 +10,21 @@ import csv
 from PyPDF2 import PdfReader
 from streamlit_gsheets import GSheetsConnection
 from PIL import Image
+from sklearn.impute import SimpleImputer
+import matplotlib.pyplot as plt
+import seaborn as sns
 load_dotenv()
 
-# api_key = os.getenv("GEMINI_API_KEY")
-# genai.configure(api_key=api_key)
+api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
 
 
 st.title('Aurora Testing')
-# model = genai.GenerativeModel('gemini-1.5-flash')
-# config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
+model = genai.GenerativeModel('gemini-1.5-flash')
+config = genai.types.GenerationConfig(temperature=0.7, max_output_tokens=4000, top_p=0.95, top_k=64)
 # prompt = 'Write a code in python to plot a barplot'
 # response = model.generate_content(prompt, generation_config=config)
 # st.write(response.text)
-
-# Lottie animation testing
-# def load_lottie_file(filepath: str):
-#     with open(filepath, "r", encoding="utf-8") as file:
-#         return json.load(file)
-
-# robot = load_lottie_file("animations/robot.json")
-# st_lottie.st_lottie(robot, key="initial")
 
 # Report Generation Testing
 # uploaded_file = st.file_uploader("Choose a file")
@@ -50,6 +45,47 @@ st.title('Aurora Testing')
 #     st.write("Profile Report generated successfully")
 
 # AI Recommender/Dataset Chat Feature Testing
+
+# Functions
+# Function for loading csv format file
+@st.cache_data
+def load_csv_format(file):
+        df = pd.read_csv(file)
+        return df
+
+# Function for loading xlsx format file
+@st.cache_data
+def load_xlsx_format(file):
+        df = pd.read_excel(file)
+        return df
+
+# Function for loading file based on its format
+@st.cache_data
+def load_file(uploaded_file):
+    if uploaded_file.name.endswith('.csv'):
+            return load_csv_format(uploaded_file)
+    elif uploaded_file.name.endswith('.xlsx'):
+            return load_xlsx_format(uploaded_file)
+    else:
+        st.error("Unsupported file format. Please upload a CSV or XLSX file.")
+
+@st.cache_data
+# Function for data cleaning
+def df_cleaning(df):
+    df = df.drop_duplicates()
+
+    # Impute missing values
+    # Seperate numerical and object columns
+    numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns
+    object_columns = df.select_dtypes(include=['object']).columns
+
+    # Impute missing values for numerical columns and object columns
+    numerical_imputer = SimpleImputer(strategy='mean')
+    df[numerical_columns] = numerical_imputer.fit_transform(df[numerical_columns])
+
+    object_imputer = SimpleImputer(strategy='most_frequent')
+    df[object_columns] = object_imputer.fit_transform(df[object_columns])
+    return df
 
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -124,84 +160,48 @@ model = genai.GenerativeModel(
 # Testing GSheets Connection
 # Testing Completed
 
-# # User contact us feature
-# st.header('📧Contact Us', divider='rainbow')
-# st.subheader("Have a query or feedback? Reach out to us!", divider='rainbow')
+# Testing streamlit form on each feature
+# Feature 1: Data cleaning and stats analysis
+# Feature 1 Testing Completed
 
-# # Establish a connection to Google Sheets
-# conn = st.connection("gsheets", type=GSheetsConnection)
+# Feature 2: AutoVisualization
+# Feature 2 Testing Completed
+# st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
+#     # Upload dataset
+# with st.form(key='data_visualization_form'):
+#         st.write("Upload a dataset to generate visualizations.")
+#         uploaded_file = st.file_uploader("Choose a file")
+#         # Select the visualization type
+#         visualization_type = st.selectbox("Select the visualization type", ["Barplot", "Histogram", "Boxplot", "Scatterplot", "Lineplot"])
+#         user_input = st.text_input("Enter the columns for visualization separated by 'and', Example: column1 and column2")
+#         submitted = st.form_submit_button("Submit")
+#         if submitted:
+#             st.success("File and visualization type submitted successfully!")
 
-# feedback_df = conn.read(worksheet="Feedback Data", ttl=5)
-# query_df = conn.read(worksheet="Query Data", ttl=5)
-# # st.dataframe(df)
-
-# # Select the action
-# action = st.selectbox("Select an action:", ["Query", "Feedback"])
-
-# # Contact Form
-# if action == "Feedback":
-#         with st.form(key='contact_form'):
-#             name = st.text_input("Name*", key='user_name')
-#             email = st.text_input("Email*", key='user_email')
-#             ratings = st.radio("Ratings", [1, 2, 3, 4, 5], key='rating')
-#             message = st.text_area("Message*", key='message')
-#             st.markdown("**Required*")
-#             submit_button = st.form_submit_button("Submit")
-#             if submit_button:
-#                if not name or not email or not message:
-#                   st.error("Please fill in the required fields.")
-#                   st.stop()
-#                elif feedback_df["Email"].str.contains(email).any():
-#                   st.warning("You have already submitted a feedback.")
-#                   st.stop()
-#                else:
-#                   user_feedback_data = pd.DataFrame({
-#                       "Name": name,
-#                       "Email": email,
-#                       "Ratings": ratings,
-#                       "Message": message
-#                   }, index=[0])
-
-#                   updated_df = pd.concat([feedback_df, user_feedback_data], ignore_index=True)
-
-#                   # Update Google Sheets with new data
-#                   conn.update(worksheet="Feedback Data", data=updated_df)
-#                   st.success("Feedback submitted successfully.")
- 
-# if action == "Query":
-#         with st.form(key='contact_form'):
-#             name = st.text_input("Name*", key="user_name")
-#             email = st.text_input("Email*", key="user_email")
-#             subject = st.text_input("Subject*", key="subject")
-#             upload_img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png"], key="upload_img")
-#             message = st.text_area("Message*", placeholder="Explain your query in detail.", key="message")
-#             check_box = st.checkbox("I agree to be contacted for further details.", key="check_box")
-#             st.markdown("**Required*")
-#             submit_button = st.form_submit_button("Submit")
-#             if submit_button:
-#                 if not name or not email or not subject or not message:
-#                     st.error("Please fill in the required fields.")
-#                     st.stop()
-#                 elif not check_box:
-#                     st.error("Please agree to be contacted for further details.")
-#                     st.stop()
-#                 else:
-#                     query_df["Email"] = query_df["Email"].astype(str)
-                    
-#                     if query_df["Email"].str.contains(email).any():
-#                       st.warning("You have already submitted a query.")
-#                       st.stop()
-#                     else:
-#                       user_query_data = pd.DataFrame({
-#                           "Name": name,
-#                           "Email": email,
-#                           "Subject": subject,
-#                           "Upload Image": upload_img,
-#                           "Message": message
-#                       }, index=[0])
-
-#                       updated_df = pd.concat([query_df, user_query_data], ignore_index=True)
-
-#                       # Update Google Sheets with new data
-#                       conn.update(worksheet="Query Data", data=updated_df)
-#                       st.success("Query submitted successfully.")
+# with st.spinner("Generating Visualization..."):
+#   if uploaded_file and visualization_type and user_input is not None:
+#       file_name = uploaded_file.name
+#       file_path = os.path.join("uploads", file_name)
+#       df = load_file(uploaded_file)
+#       df = df_cleaning(df)
+#       df_sample = str(df.head())
+#       columns = user_input
+#       st.subheader(f"{visualization_type} Visualization for the dataset '{file_name}' for the columns {columns}:")
+#       predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
+#       Plot for the dataset columns {columns}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
+#       Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
+#       response = model.generate_content(predefined_prompt, generation_config=config)
+#       generated_code = response.text
+#       generated_code = generated_code.replace("```python", "").replace("```", "").strip()
+#       # Modify the code to insert the actual file path into pd.read_csv()
+#       if "pd.read_csv" in generated_code:
+#           generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
+#       elif "pd.read_excel" in generated_code:
+#           generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
+#       st.code(generated_code, language='python')
+#       try:
+#           exec(generated_code)
+#           st.pyplot(plt.gcf())
+#       except Exception as e:
+#           st.error(e)
+#       st.success("Visualization generated successfully!")
