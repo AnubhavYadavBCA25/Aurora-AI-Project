@@ -28,6 +28,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+###################################################### Google Sheets Connection #######################################
+# Establish a connection to Google Sheets
+conn = st.connection("gsheets", type=GSheetsConnection)
+# Read the data from Google Sheets
+feedback_df = conn.read(worksheet="Feedback", ttl=60)
+query_df = conn.read(worksheet="Query", ttl=60)
+user_df = conn.read(worksheet="UserLogin", ttl=60)
+
 ###################################################### User Authentication ######################################################
 
 # Loading config file
@@ -47,13 +55,13 @@ def show_login_form():
         config['cookie']['expiry_days'],
         # config['register_user']
     )
-
+    
     # Creating a login widget
     try:
         authenticator.login()
     except LoginError as e:
         st.error(e)
-
+    
     if st.session_state["authentication_status"]:
         authenticator.logout('Logout',"sidebar")
         st.sidebar.write(f'Welcome **{st.session_state["name"]}**👋')
@@ -79,18 +87,36 @@ def show_register_form():
     if st.button("Submit Registration"):
         if new_username and new_password and new_email:
             # Hash the new password
-            # hashed_password = Hasher(new_password).generate()[0]
-            hashed_password = Hasher.hash(new_password)
-            # Update the config dictionary
+            # hashed_password = Hasher().generate(new_password)[0]
+            hashed_password = Hasher([new_password]).hash(new_password)
+            if 'credentials' not in config:
+                config['credentials'] = {}
+            if 'usernames' not in config['credentials']:
+                config['credentials']['usernames'] = {}
+                
+             # Update the config dictionary
             config['credentials']['usernames'][new_username] = {
                 'name': new_name,
                 'password': hashed_password,
                 'email': new_email
             }
+        
             # Save the updated credentials to the config.yaml file
             with open('config.yaml', 'w') as file:
                 yaml.dump(config, file)
+                
+            user_data = pd.DataFrame({
+                            "Username": new_username,
+                            "Name": new_name,
+                            "Email": new_email,
+                            "Hash_pass": hashed_password
+                        }, index=[0])
+                    
+            # Update the user data
+            updated_df = pd.concat([user_df, user_data], ignore_index=True)
 
+            # Update Google Sheets with new User Data
+            conn.update(worksheet="UserLogin", data=updated_df)
             st.success("User registered successfully! You can now log in.")
             st.session_state['register'] = False  # Go back to login page
         else:
@@ -131,13 +157,7 @@ config_for_chatbot = {
 }
 model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generation_config=config_for_chatbot)
 
-###################################################### Google Sheets Connection #######################################
-# Establish a connection to Google Sheets
-conn = st.connection("gsheets", type=GSheetsConnection)
 
-# Read the data from Google Sheets
-feedback_df = conn.read(worksheet="Feedback Data", ttl=60)
-query_df = conn.read(worksheet="Query Data", ttl=60)
 
 ###################################################### Functions ######################################################
 # Function for loading csv format file
@@ -634,23 +654,25 @@ def contact_us():
                 if not name or not email or not message:
                     st.error("Please fill in the required fields.")
                     st.stop()
-                elif feedback_df["Email"].str.contains(email).any():
-                    st.warning("You have already submitted a feedback.")
-                    st.stop()
-                else:
-                    user_feedback_data = pd.DataFrame({
-                        "Name": name,
-                        "Email": email,
-                        "Ratings": ratings,
-                        "Message": message
-                    }, index=[0])
+                else :
+                    feedback_df["Email"] = feedback_df["Email"].astype(str) 
+                    if feedback_df["Email"].str.contains(email).any():
+                        st.warning("You have already submitted a feedback.")
+                        st.stop()
+                    else:
+                        user_feedback_data = pd.DataFrame({
+                            "Name": name,
+                            "Email": email,
+                            "Ratings": ratings,
+                            "Message": message
+                        }, index=[0])
                     
-                    # Update the feedback data
-                    updated_df = pd.concat([feedback_df, user_feedback_data], ignore_index=True)
+                        # Update the feedback data
+                        updated_df = pd.concat([feedback_df, user_feedback_data], ignore_index=True)
 
-                    # Update Google Sheets with new Feedback Data
-                    conn.update(worksheet="Feedback Data", data=updated_df)
-                    st.success("Feedback submitted successfully!")
+                        # Update Google Sheets with new Feedback Data
+                        conn.update(worksheet="Feedback", data=updated_df)
+                        st.success("Feedback submitted successfully!")
 
     if action == "Query":
         with st.form(key='contact_form'):
@@ -685,7 +707,7 @@ def contact_us():
                         updated_df = pd.concat([query_df, user_query_data], ignore_index=True)
 
                         # Update Google Sheets with new Query Data
-                        conn.update(worksheet="Query Data", data=updated_df)
+                        conn.update(worksheet="Query", data=updated_df)
                         st.success("Query submitted successfully!")
             
 ###################################################### Page 8: About Us ######################################################
