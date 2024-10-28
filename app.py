@@ -32,8 +32,8 @@ st.set_page_config(
 # Establish a connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 # Read the data from Google Sheets
-feedback_df = conn.read(worksheet="Feedback", ttl=60)
-query_df = conn.read(worksheet="Query", ttl=60)
+feedback_df = conn.read(worksheet="Feedback Data", ttl=60)
+query_df = conn.read(worksheet="Query Data", ttl=60)
 user_df = conn.read(worksheet="UserLogin", ttl=60)
 
 ###################################################### User Authentication ######################################################
@@ -671,7 +671,7 @@ def contact_us():
                         updated_df = pd.concat([feedback_df, user_feedback_data], ignore_index=True)
 
                         # Update Google Sheets with new Feedback Data
-                        conn.update(worksheet="Feedback", data=updated_df)
+                        conn.update(worksheet="Feedback Data", data=updated_df)
                         st.success("Feedback submitted successfully!")
 
     if action == "Query":
@@ -707,7 +707,7 @@ def contact_us():
                         updated_df = pd.concat([query_df, user_query_data], ignore_index=True)
 
                         # Update Google Sheets with new Query Data
-                        conn.update(worksheet="Query", data=updated_df)
+                        conn.update(worksheet="Query Data", data=updated_df)
                         st.success("Query submitted successfully!")
             
 ###################################################### Page 8: About Us ######################################################
