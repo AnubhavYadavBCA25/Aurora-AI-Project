@@ -4,6 +4,10 @@ cookie:
   name: aurora_app
 credentials:
   usernames:
+    anubhavyadav:
+      email: anubhavyadav77ff@gmail.com
+      name: Anubhav Yadav
+      password: $2b$12$6Rm6pKvgCYhr2YRbrV.6L.ii6Ws71PbpYjfluCgGPRvUj9P2mTeGG
     thenitro:
       email: nitrov99@gmail.com
       name: Ujjwal Singh

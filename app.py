@@ -157,8 +157,6 @@ config_for_chatbot = {
 }
 model_for_chatbot = genai.GenerativeModel(model_name='gemini-1.5-flash',generation_config=config_for_chatbot)
 
-
-
 ###################################################### Functions ######################################################
 # Function for loading csv format file
 @st.cache_data
@@ -730,6 +728,23 @@ def about_us():
         with right_column:
             anubhav_profile = load_lottie_file('profile_animations/anubhav_profile.json')
             st_lottie.st_lottie(anubhav_profile, key='anubhav', height=305, width=305 ,loop=True, quality='high')
+        
+    with st.container(border=True):
+        left_column, right_column = st.columns(2)
+        with right_column:
+            st.subheader("Ujjwal Kumar Singh", divider='rainbow')
+            st.markdown('''
+                        - **Role:** Junior Developer
+                        - **Email:** [![Ujjwal Email](https://img.icons8.com/color/30/email.png)](theujjwalsinghh@gmail.com)
+                        - **LinkedIn:** [![Ujjwal LinkedIn](https://img.icons8.com/color/30/linkedin.png)](https://www.linkedin.com/in/theujjwalsingh18/)
+                        - **GitHub:** [![Ujjwal GitHub](https://badgen.net/badge/icon/GitHub?icon=github&label)](https://github.com/theujjwalsingh18)
+                        - **Bio:** Ujjwal is a tech-savvy blending web development expertise with Data Science skills. Proficient in Python, 
+                            Machine Learning, and Data Analysis, Web Development, DSA. Pursuing a Bachelor's degree in Computer Applications 
+                            with Data Science.
+                        ''')
+        with left_column:
+            ujjwal_profile = load_lottie_file('profile_animations/ujjwal_profile.json')
+            st_lottie.st_lottie(ujjwal_profile, key='ujjwal', height=305, width=305 ,loop=True, quality='high')
     st.divider()
 
     # Footer
