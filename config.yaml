@@ -4,43 +4,15 @@ cookie:
   name: aurora_app
 credentials:
   usernames:
-    ak9888:
-      email: ak9888@srmist.edu.in
-      name: arnav kumar
-      password: $2b$12$t/CusPJ8HRDzK8al/mTr5OMK.meh.wqqIGZCwP2b0ENJaniDcukBW
-    anubhavyadav:
-      email: anubhav@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: Anubhav Yadav
-      password: $2b$12$uoonWIdSMPfuNg0StCUVj.VS/ylo2vRK3bsCN7i.W4lh8Cl5E9Bu.
-    demo:
-      email: demo@gmail.com
-      name: Demo
-      password: $2b$12$iamhz.P.lRveFnoDJB/cweXJCP8K3RNy6TaGW8.XtbebfpbzldlbS
-    drishtijaiswal:
-      email: drishti@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: Drishti Jaiswal
-      password: $2b$12$LfRqC5gspjgSzEcAhIg6MeKlL525SdOYiCNhwlErSOOztA1RMIAOy
-    eshaansabharwal:
-      email: eshaan@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: Eshaan Sabharwal
-      password: $2b$12$F1mJrG7CKBy.7CM51Q0Rwe7C6b2yf9hndbv.QgO2F7x/.XS8KAhXW
-    rahul:
-      email: rahul@gmail.com
-      name: Rahul Sharma
-      password: $2b$12$.eFxZB8yVVRfBDUuXatco.BzrQlZ.TgS0mYPbNSSSGd2fDBGJLMlm
-    shobhit:
-      email: shobhitadhya@gmail.com
-      name: Shobhit Kumar
-      password: $2b$12$de22mDX4vQMnJO7xVN7e.u9XM4kiOOzdKPWmb5HHTg0maa.tvEDZS
-    sparshjaiswal:
-      email: sparsh@gmail.com
-      failed_login_attempts: 0
-      logged_in: false
-      name: Sparsh Jaiswal
-      password: $2b$12$kOE2qlBMrHN7DJbWmiTGR.ZwV3ee3ntC4tfaieOJedPb8csDb.Qfm
+    thenitro:
+      email: nitrov99@gmail.com
+      name: Ujjwal Singh
+      password: $2b$12$bz3WEpRe2kykp8Hxkrp64Omh0vbSymWKkSB9zu8mZI3oK9FWexj9O
+    theujjwalsingh18:
+      email: theujjwalsinghh@gmail.com
+      name: Ujjwal Singh
+      password: $2b$12$Y6kgKE8SOw3XzJpZ3.cPmuvNnA4ffsOSzeDOy9uSmNW8/CiUculXm
+    ujju99:
+      email: theujjwalsinghh@gmail.com
+      name: Ujjwal Singh
+      password: $2b$12$8eRERbJZQ7YKntMFu/m9IOx7hyIOZZ0wt55U3i.TKyuegAZfZRqN2
