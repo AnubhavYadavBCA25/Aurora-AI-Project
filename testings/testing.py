@@ -13,6 +13,7 @@ from PIL import Image
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pandas_profiling import ProfileReport
 load_dotenv()
 
 api_key = os.getenv("GEMINI_API_KEY")
@@ -135,6 +136,16 @@ def extract_pdf_data(pathname: str) -> list[str]:
         parts.append(f"--- Page {page_num} ---")
         parts.append(page.extract_text())
   return parts
+
+@st.cache_data
+def generate_report(df,file):
+    # Generate profiling report
+    profile = ProfileReport(df, title="Dataset Report", explorative=True)
+
+    # Save the report as an HTML file
+    output_path = os.path.join("reports", f"{file.name.split('.')[0]}_report.html")
+    profile.to_file(output_path)
+    return output_path
 # Create the model
 generation_config = {
   "temperature": 1,
@@ -160,48 +171,15 @@ model = genai.GenerativeModel(
 # Testing GSheets Connection
 # Testing Completed
 
-# Testing streamlit form on each feature
-# Feature 1: Data cleaning and stats analysis
+# Testing streamlit form and modifications on each feature
+# Feature 1: Data cleaning and stats analysis (some modifications remaining)
 # Feature 1 Testing Completed
 
-# Feature 2: AutoVisualization
+# Feature 2: AutoVisualization (some modifications remaining)
 # Feature 2 Testing Completed
-# st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
-#     # Upload dataset
-# with st.form(key='data_visualization_form'):
-#         st.write("Upload a dataset to generate visualizations.")
-#         uploaded_file = st.file_uploader("Choose a file")
-#         # Select the visualization type
-#         visualization_type = st.selectbox("Select the visualization type", ["Barplot", "Histogram", "Boxplot", "Scatterplot", "Lineplot"])
-#         user_input = st.text_input("Enter the columns for visualization separated by 'and', Example: column1 and column2")
-#         submitted = st.form_submit_button("Submit")
-#         if submitted:
-#             st.success("File and visualization type submitted successfully!")
 
-# with st.spinner("Generating Visualization..."):
-#   if uploaded_file and visualization_type and user_input is not None:
-#       file_name = uploaded_file.name
-#       file_path = os.path.join("uploads", file_name)
-#       df = load_file(uploaded_file)
-#       df = df_cleaning(df)
-#       df_sample = str(df.head())
-#       columns = user_input
-#       st.subheader(f"{visualization_type} Visualization for the dataset '{file_name}' for the columns {columns}:")
-#       predefined_prompt = f"""Write a python code to plot a {visualization_type} using Matplotlib or Seaborn Library. Name of the dataset is {file_name}.
-#       Plot for the dataset columns {columns}. Here's the sample of dataset {df_sample}. Set xticks rotation 90 degree. 
-#       Set title in each plot. Add tight layout in necessary plots. Don't right the explanation, just write the code."""
-#       response = model.generate_content(predefined_prompt, generation_config=config)
-#       generated_code = response.text
-#       generated_code = generated_code.replace("```python", "").replace("```", "").strip()
-#       # Modify the code to insert the actual file path into pd.read_csv()
-#       if "pd.read_csv" in generated_code:
-#           generated_code = generated_code.replace("pd.read_csv()", f'pd.read_csv(r"{file_path}")')
-#       elif "pd.read_excel" in generated_code:
-#           generated_code = generated_code.replace("pd.read_excel()", f'pd.read_excel(r"{file_path}")')
-#       st.code(generated_code, language='python')
-#       try:
-#           exec(generated_code)
-#           st.pyplot(plt.gcf())
-#       except Exception as e:
-#           st.error(e)
-#       st.success("Visualization generated successfully!")
+# Feature 3: AI Recommendation
+# Feature 3 Testing Completed
+
+# Feature 4: Report Generation
+# Feature 4 Testing Completed
