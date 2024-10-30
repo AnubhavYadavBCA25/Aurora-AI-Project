@@ -360,7 +360,7 @@ def statistical_analysis():
     with st.form(key='data_cleaning_form'):
         st.write('Upload a dataset for cleaning and statistical analysis:')
         # Upload dataset
-        uploaded_file = st.file_uploader("Upload a dataset", type=["csv", "xlsx"])
+        uploaded_file = st.file_uploader("Upload a dataset*", type=["csv", "xlsx"])
 
         # Submit button
         submitted = st.form_submit_button("Submit")
@@ -420,13 +420,13 @@ def data_visualization():
     with st.form(key='data_visualization_form'):
         st.write("Upload a dataset to generate visualizations.")
         # Upload dataset
-        uploaded_file = st.file_uploader("Choose a file")
+        uploaded_file = st.file_uploader("Choose a file*", type=["csv", "xlsx"])
         
         # Select the visualization type
-        visualization_type = st.selectbox("Select the visualization type", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Heatmap", "Pie Chart", "Violin Plot", "Count Plot",  "KDE Plot"])
+        visualization_type = st.selectbox("Select the visualization type*", ["Bar Chart", "Line Chart", "Scatter Plot", "Histogram", "Box Plot", "Heatmap", "Pie Chart", "Violin Plot", "Count Plot",  "KDE Plot"])
         
         # Enter the columns for visualization
-        user_input = st.text_input("Enter the columns for visualization separated by 'and', Example: column1 and column2")
+        user_input = st.text_input("Enter the columns for visualization separated by 'and', (Example: column1 and column2)*")
         
         # Submit button
         submitted = st.form_submit_button("Submit")
@@ -438,7 +438,11 @@ def data_visualization():
         if uploaded_file and visualization_type and user_input is not None:
             # Get file name and path
             file_name = uploaded_file.name
-            file_path = os.path.join("uploads", file_name)
+            file_path = os.path.join(os.getcwd(), file_name)
+
+            # Save the uploaded file to the current working directory
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
 
             # Load the file based on its format and clean the data
             df = load_file(uploaded_file)
@@ -487,8 +491,8 @@ def ai_recommendation():
         st.write("Upload a file to get AI recommendation")
 
         # Upload dataset and select the type of recommendation
-        uploaded_file = st.file_uploader("Choose a file")
-        type_of_recommendation = st.radio("Select the type of recommendation", ['Present', 'Future'])
+        uploaded_file = st.file_uploader("Choose a file*", type=["csv"])
+        type_of_recommendation = st.radio("Select the type of recommendation*", ['Present', 'Future'])
 
         # Submit button
         submitted = st.form_submit_button("Submit")
@@ -535,7 +539,7 @@ def analysis_report():
     # Create a form for uploading the dataset and generating the report
     with st.form(key='report_generation'):
         # Upload dataset
-        uploaded_file = st.file_uploader("Choose a file")
+        uploaded_file = st.file_uploader("Choose a file*", type=["csv", "xlsx"])
         # Submit button
         submitted = st.form_submit_button("Submit")
         if submitted:
@@ -575,39 +579,59 @@ def analysis_report():
         else:
             st.warning("Please upload a file to generate a report")
 
-###################################################### Page 6: Dataset ChatBot ######################################################
+###################################################### Page 6: CSV Dataset ChatBot ######################################################
 def ai_data_file_chatbot():
     st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
-    # Upload dataset
-    st.write('Upload a dataset to chat with data file:')
-    uploaded_file = st.file_uploader("Upload a dataset", type=["csv"])
-    if uploaded_file is not None:
-        st.success("File uploaded successfully!")
-        # Get the user question
-        question = st.text_input("Ask a question:", key="question")
-        if st.button("Submit"):
-            with st.spinner("Processing..."):
-                file_name = uploaded_file.name
-                st.subheader("ChatBot Response:")
-                file_path = os.path.join(os.getcwd(), file_name)
-                with open(file_path, "wb") as f:
-                    f.write(uploaded_file.getbuffer())
 
-                # Upload the file to Gemini and wait for it to be active
-                files = [upload_to_gemini(file_name, mime_type="text/csv")]
-                wait_for_files_active(files)
-                # Start a chat session with the uploaded file
-                chat_session = model.start_chat(
+    # Create a form for uploading the dataset and asking a query
+    with st.form(key="chatbot_form"):
+        st.write('Upload a dataset to chat with data file:')
+
+        # Upload dataset and ask a query
+        uploaded_file = st.file_uploader("Upload a dataset*", type=["csv"])
+        query = st.text_input("Ask a question*", key="query")
+
+        # Submit button
+        submitted = st.form_submit_button("Submit")
+        if submitted:
+            # Check if the uploaded file and query are provided before proceeding, else display an error message and stop the execution
+            if not uploaded_file or not query:
+                st.error("Please upload both required fields to proceed!")
+                st.stop()
+            else:
+                st.success("Dataset and Query submitted successfully!")
+
+    # Generate the response based on the uploaded file and the query
+    with st.spinner("Processing..."):
+        
+        # Check if the uploaded file and query are provided before proceeding
+        if uploaded_file and query is not None:
+            # Get the uploaded file name and path
+            filename = uploaded_file.name
+            file_path = os.path.join(os.getcwd(), filename)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # Upload the file to Gemini and wait for it to be active
+            files = [upload_to_gemini(filename, mime_type="text/csv")]
+            wait_for_files_active(files)
+
+            # Start a chat session with the uploaded file
+            chat_session = model.start_chat(
                 history=[
                     {
-                    "role":"user",
-                    "parts":extract_csv_data(file_name)
-                    },
+                        "role": "user",
+                        "parts": extract_csv_data(filename)
+                    }
                 ]
-                )
-                # Send the user question to the chatbot for response
-                response = chat_session.send_message(question)
-                st.write(response.text)
+            )
+
+            # Send the query to the chatbot and get the response
+            response = chat_session.send_message(query)
+            st.subheader("ChatBot Response:")
+            st.write(response.text)
+        else:
+            st.warning("Please upload a dataset and ask a question to proceed!")
 
 ###################################################### Page 7: Vision Analysis ######################################################
 def vision_analysis():

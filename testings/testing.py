@@ -183,3 +183,40 @@ model = genai.GenerativeModel(
 
 # Feature 4: Report Generation
 # Feature 4 Testing Completed
+
+# Feature 5: AI CSV File ChatBot
+st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
+with st.form(key="chatbot_form"):
+  st.write('Upload a dataset to chat with data file:')
+  uploaded_file = st.file_uploader("Upload a dataset*", type=["csv"])
+  query = st.text_input("Ask a question*", key="query")
+  submitted = st.form_submit_button("Submit")
+  if submitted:
+      if not uploaded_file or not query:
+          st.error("Please upload both required fields to proceed!")
+          st.stop()
+      else:
+          st.success("Dataset and Query submitted successfully!")
+
+with st.spinner("Processing..."):
+        if uploaded_file and query is not None:
+          filename = uploaded_file.name
+          file_path = os.path.join(os.getcwd(), filename)
+          with open(file_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+          files = [upload_to_gemini(filename, mime_type="text/csv")]
+          wait_for_files_active(files)
+          chat_session = model.start_chat(
+              history=[
+                  {
+                      "role": "user",
+                      "parts": extract_csv_data(filename)
+                  }
+              ]
+          )
+          response = chat_session.send_message(query)
+          st.subheader("ChatBot Response:")
+          st.write(response.text)
+        else:
+          st.warning("Please upload a dataset and ask a question to proceed!")
