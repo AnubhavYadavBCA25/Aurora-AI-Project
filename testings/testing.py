@@ -185,38 +185,35 @@ model = genai.GenerativeModel(
 # Feature 4 Testing Completed
 
 # Feature 5: AI CSV File ChatBot
-st.header('🤖SmartQuery: AI Powered Dataset ChatBot', divider='rainbow')
-with st.form(key="chatbot_form"):
-  st.write('Upload a dataset to chat with data file:')
-  uploaded_file = st.file_uploader("Upload a dataset*", type=["csv"])
-  query = st.text_input("Ask a question*", key="query")
+# Feature 5 Testing Completed
+
+# Feature 6: Image Analysis
+st.header('👁️VisionFusion: AI-Powered Image Analysis ', divider='rainbow')
+with st.form(key='img_analysis'):
+  st.write('Upload an image to analyze:')
+  uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+  user_query = st.text_input("Ask a query:")
   submitted = st.form_submit_button("Submit")
   if submitted:
-      if not uploaded_file or not query:
+      if not uploaded_image or not user_query:
           st.error("Please upload both required fields to proceed!")
           st.stop()
       else:
-          st.success("Dataset and Query submitted successfully!")
+          st.success("Image and Query submitted successfully!")
 
 with st.spinner("Processing..."):
-        if uploaded_file and query is not None:
-          filename = uploaded_file.name
-          file_path = os.path.join(os.getcwd(), filename)
-          with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-          files = [upload_to_gemini(filename, mime_type="text/csv")]
-          wait_for_files_active(files)
-          chat_session = model.start_chat(
-              history=[
-                  {
-                      "role": "user",
-                      "parts": extract_csv_data(filename)
-                  }
-              ]
-          )
-          response = chat_session.send_message(query)
-          st.subheader("ChatBot Response:")
+  if uploaded_image and user_query is not None:
+          # Show uploaded image
+          st.subheader('Uploaded Image')
+          st.image(uploaded_image, caption="Uploaded Image", use_column_width=False)
+          file_name = uploaded_image.name
+          st.subheader(f"'{file_name}' Image Analysis:")
+          st.divider()
+          image = Image.open(uploaded_image)
+          prompt = f"Analyze the image and provide a detailed description of the image. {user_query}"
+          response = model.generate_content([prompt,image], stream=True)
+          response.resolve()
           st.write(response.text)
-        else:
-          st.warning("Please upload a dataset and ask a question to proceed!")
+          st.success("Image analyzed successfully!")
+  else:
+      st.warning("Please upload a dataset and ask a question to proceed!")

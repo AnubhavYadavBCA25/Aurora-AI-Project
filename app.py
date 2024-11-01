@@ -244,6 +244,7 @@ def extract_csv_data(pathname: str) -> list[str]:
 
 ###################################################### Page 1: Introduction Page ######################################################
 def introduction():
+    st.info("Note: Aurora is still in development. Some features may not work as you expect. We are working on it to make it better.")
     st.header('🤖Aurora: AI Powered Automated Data Analytics Tool', divider='rainbow')
     
     with st.container(border=False):
@@ -260,7 +261,7 @@ def introduction():
             st.markdown(intro_text)
 
         with right_column:
-            robot_file = load_lottie_file('animations_and_audios/robot.json')
+            robot_file = load_lottie_file('animations/robot.json')
             st_lottie.st_lottie(robot_file, key='robot', height=450, width=450 ,loop=True)
     st.divider()
 
@@ -278,7 +279,7 @@ def introduction():
             st.markdown(feature_text)
         
         with left_column:
-            features = load_lottie_file('animations_and_audios/features.json')
+            features = load_lottie_file('animations/features.json')
             st_lottie.st_lottie(features, key='features', height=400, width=400 ,loop=True)
     st.divider()
 
@@ -297,7 +298,7 @@ def introduction():
                         ''')
             st.warning("It is important to keep your API key secure and not share it with anyone.",icon="ℹ️")
         with right_column:
-            gemini_logo = load_lottie_file('animations_and_audios/gemini_logo.json')
+            gemini_logo = load_lottie_file('animations/gemini_logo.json')
             st_lottie.st_lottie(gemini_logo, key='logo', height=400, width=400 ,loop=True)
     st.divider()
     
@@ -364,8 +365,14 @@ def statistical_analysis():
 
         # Submit button
         submitted = st.form_submit_button("Submit")
+
+        # Check if the file is uploaded before proceeding, else display an error message and stop the execution
         if submitted:
-            st.success("File uploaded successfully!")
+            if not uploaded_file:
+                st.error("Please upload a file to proceed!")
+                st.stop()
+            else:
+                st.success("File uploaded successfully!")
 
     if uploaded_file is not None:
     # Load the file based on its format
@@ -413,6 +420,9 @@ def statistical_analysis():
                 col2.write(df.select_dtypes(include=[np.number]).nunique())
                 st.success("Data Cleaning & Statistical Analysis completed successfully!")
 
+    else:
+        st.warning("Please upload a dataset to proceed!")
+
 ###################################################### Page 3: Data Visualization ######################################################
 def data_visualization():
     st.header('📈AutoViz: Data Visualization & EDA', divider='rainbow')
@@ -430,8 +440,14 @@ def data_visualization():
         
         # Submit button
         submitted = st.form_submit_button("Submit")
+
+        # Check if the file, visualization type, and user input are provided before proceeding, else display an error message and stop the execution
         if submitted:
-            st.success("File and visualization type submitted successfully!")
+            if not uploaded_file or not visualization_type or not user_input:
+                st.error("Please upload all required fields to proceed!")
+                st.stop()
+            else:
+                st.success("File and visualization type submitted successfully!")
     
     with st.spinner("Generating Visualization..."):
         # Check if the file, visualization type, and user input are provided before generating the visualization
@@ -482,6 +498,8 @@ def data_visualization():
             except Exception as e:
                 st.error(e)
             st.success("Visualization generated successfully!")
+        else:
+            st.warning("Please upload a file, select the visualization type, and enter the columns for visualization.")
 
 ###################################################### Page 4: AI Based Recommendations ######################################################
 def ai_recommendation():
@@ -496,8 +514,14 @@ def ai_recommendation():
 
         # Submit button
         submitted = st.form_submit_button("Submit")
+
+        # Check if the file is uploaded and the type of recommendation is selected before proceeding, else display an error message and stop the execution
         if submitted:
-            st.success("File and recommendation type submitted successfully!")
+            if not uploaded_file or not type_of_recommendation:
+                st.error("Please upload a file and select the type of recommendation.")
+                st.stop()
+            else:
+                st.success("File and recommendation type submitted successfully!")
     
     # Generate the recommendation based on the uploaded file and the type of recommendation
     with st.spinner("Generating Recommendation..."):
@@ -542,8 +566,14 @@ def analysis_report():
         uploaded_file = st.file_uploader("Choose a file*", type=["csv", "xlsx"])
         # Submit button
         submitted = st.form_submit_button("Submit")
+
+        # Check if the file is uploaded before proceeding, else display an error message and stop the execution
         if submitted:
-            st.success("File uploaded successfully")
+            if not uploaded_file:
+                st.error("Please upload a file to generate a report.")
+                st.stop()
+            else:
+                st.success("File uploaded successfully")
     
     # Generate the report based on the uploaded file
     with st.spinner("Generating Report..."):
@@ -636,25 +666,50 @@ def ai_data_file_chatbot():
 ###################################################### Page 7: Vision Analysis ######################################################
 def vision_analysis():
     st.header('👁️VisionFusion: AI-Powered Image Analysis ', divider='rainbow')
-    # Upload image
-    st.write('Upload an image to analyze:')
-    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-    if uploaded_image is not None:
-        # Show uploaded image
-        st.image(uploaded_image, caption="Uploaded Image", use_column_width=False)
-        st.success("Image uploaded successfully!")
-        user_query = st.text_input("Ask a query:")
-        if st.button("Submit"):
-            with st.spinner("Processing..."):
+
+    # Create a form for uploading the image and asking a query
+    with st.form(key='img_analysis'):
+        st.write('Upload an image and ask query to analyze:')
+        # Upload image and Ask a query
+        uploaded_image = st.file_uploader("Upload an image*", type=["jpg", "jpeg", "png"])
+        user_query = st.text_input("Ask a query*", key="img_query")
+        
+        # Submit button
+        submitted = st.form_submit_button("Submit")
+
+        # Check if the uploaded image and query are provided before proceeding, else display an error message and stop the execution
+        if submitted:
+            if not uploaded_image or not user_query:
+                st.error("Please upload both required fields to proceed!")
+                st.stop()
+            else:
+                st.success("Image and Query submitted successfully!")
+
+    # Generate the response based on the uploaded image and the query
+    with st.spinner("Processing..."):
+
+        # Check if the uploaded image and query are provided before proceeding, else ask the user to upload the image and ask a query
+        if uploaded_image and user_query is not None:
+                # Show uploaded image
+                st.subheader('Uploaded Image')
+                st.image(uploaded_image, caption="Uploaded Image", use_column_width=False)
+
+                # Get the uploaded image name
                 file_name = uploaded_image.name
+
+                # Open the uploaded image, provide a predefined prompt for the model, and generate the response
                 st.subheader(f"'{file_name}' Image Analysis:")
                 st.divider()
                 image = Image.open(uploaded_image)
                 prompt = f"Analyze the image and provide a detailed description of the image. {user_query}"
                 response = model.generate_content([prompt,image], stream=True)
+
+                # Resolving the response and displaying the result
                 response.resolve()
                 st.write(response.text)
                 st.success("Image analyzed successfully!")
+        else:
+            st.warning("Please upload a dataset and ask a question to proceed!")
 
 ###################################################### Page 8: Contact Us ####################################################
 def contact_us():
@@ -663,15 +718,19 @@ def contact_us():
 
     # Select the action
     action = st.selectbox("Select an action:", ["Query", "Feedback"])
-    # Contact Form
+    
+    # Form for submitting feedback
     if action == "Feedback":
         with st.form(key='contact_form'):
+            # Enter the feedback details
             name = st.text_input("Name*", key='user_name')
             email = st.text_input("Email*", key='user_email')
             ratings = st.radio("Ratings*", [1, 2, 3, 4, 5], key='rating')
             message = st.text_area("Message*", key='message')
             st.markdown("**Required*")
             submit_button = st.form_submit_button("Submit")
+
+            # Check if the required fields are filled before submitting the feedback, else display an error message and stop the execution
             if submit_button:
                 if not name or not email or not message:
                     st.error("Please fill in the required fields.")
@@ -696,8 +755,10 @@ def contact_us():
                         conn.update(worksheet="Feedback Data", data=updated_df)
                         st.success("Feedback submitted successfully!")
 
+    # Form for submitting query
     if action == "Query":
         with st.form(key='contact_form'):
+            # Enter the query details
             name = st.text_input("Name*", key="user_name")
             email = st.text_input("Email*", key="user_email")
             subject = st.text_input("Subject*", key="subject")
@@ -705,6 +766,8 @@ def contact_us():
             check_box = st.checkbox("I agree to be contacted for further details.", key="check_box")
             st.markdown("**Required*")
             submit_button = st.form_submit_button("Submit")
+
+            # Check if the required fields are filled before submitting the query, else display an error message and stop the execution
             if submit_button:
                 if not name or not email or not subject or not message:
                     st.error("Please fill in the required fields.")
