@@ -91,50 +91,6 @@ The platform offers a suite of six powerful features, each designed to address s
 5. **VisionFusion:** AI-powered image analysis (New!)
 6. **FutureCast AI:** AI-driven recommendations based on dataset analysis (New!)
 
-## Detailed Feature Descriptions
-
-### CleanStats
-- **Data Cleaning:** 
-  - Automatic detection and removal of duplicate entries
-  - Advanced missing value imputation using multiple strategies
-  - Outlier detection and handling
-- **Statistical Analysis:** 
-  - Comprehensive descriptive statistics
-  - Correlation analysis with interactive heatmaps
-  - Distribution analysis with automatic plot generation
-
-### AutoViz
-- Dynamic visualization generation leveraging Matplotlib and Seaborn
-- AI-assisted plot selection based on data characteristics
-- Interactive customization options for generated visualizations
-- Support for various chart types: scatter plots, line charts, bar charts, histograms, box plots, etc.
-
-### InsightGen
-- Generates detailed text reports using Gemini AI, providing data-driven insights
-- Produces interactive HTML reports with ydata-profiling for comprehensive data understanding
-- Customizable report templates to focus on specific aspects of the data
-
-### SmartQuery
-- Utilizes Gemini API for advanced natural language understanding
-- Performs complex data analysis based on natural language user queries
-- Supports a wide range of analytical questions, from simple summaries to complex correlations
-
-### VisionFusion
-- AI-powered image analysis capabilities
-- Features include:
-  - Text extraction from images (OCR)
-  - Image based data analysis
-  - Visual content moderation
-
-### FutureCast AI
-- AI-driven recommendation system based on dataset analysis
-- Provides actionable insights and future predictions
-- Features include:
-  - Trend analysis and forecasting
-  - Anomaly detection in time-series data
-  - Customer segmentation and personalized recommendations
-  - Risk assessment and mitigation strategies
-
 ## Technology Stack
 
 - **Backend:** Python 3.12
